@@ -1,6 +1,6 @@
 {
   "name": "@tech-style/json-compress",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Lossless, dependency-free JSON compression for JavaScript. Hoists repeated object keys into a catalogue, packs arrays of objects into columnar tables, and de-duplicates repeated string values - typically 40-80% smaller JSON, still valid JSON, and a byte-perfect round trip.",
   "license": "MIT",
   "type": "module",

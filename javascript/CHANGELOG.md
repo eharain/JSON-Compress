@@ -4,6 +4,17 @@ All notable changes to `@tech-style/json-compress` are recorded here. The format
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2026-08-18
+
+### Fixed
+
+- The jsDelivr URLs in the documentation pointed at a tag name rather than a
+  version. jsDelivr indexes the tag `v1.0.2` as version `1.0.2`, so every
+  documented URL now reads `@1.0.2` and resolves. The previous form returned a
+  404 whose message named the file rather than the version.
+- `browser.md` records the prefix rule and the purge endpoint, for the minute
+  after a tag is pushed when the CDN has the version but not yet the file.
+
 ## [1.0.1] - 2026-08-18
 
 ### Fixed
@@ -42,5 +53,6 @@ First release.
 - TypeScript definitions, an ESM build, a CommonJS build and a browser global.
 - The wire format specification, in `SPEC.md` at the repository root.
 
+[1.0.2]: https://github.com/eharain/JSON-Compress/releases/tag/v1.0.2
 [1.0.1]: https://github.com/eharain/JSON-Compress/releases/tag/v1.0.1
 [1.0.0]: https://github.com/eharain/JSON-Compress/releases/tag/v1.0.0

@@ -111,7 +111,7 @@ The built bundles are committed here, so jsDelivr serves them straight out of
 this repository. One script tag and you have it:
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/eharain/JSON-Compress@1.0.1/javascript/dist/json-compress.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/eharain/JSON-Compress@1.0.2/javascript/dist/json-compress.min.js"></script>
 <script>
   const small = jsonCompress.compress(myData);
   const back  = jsonCompress.decompress(small);
@@ -123,7 +123,7 @@ Or as an ES module, no bundler involved:
 ```html
 <script type="module">
   import { compress, measure } from
-    'https://cdn.jsdelivr.net/gh/eharain/JSON-Compress@1.0.1/javascript/dist/index.mjs';
+    'https://cdn.jsdelivr.net/gh/eharain/JSON-Compress@1.0.2/javascript/dist/index.mjs';
 </script>
 ```
 
