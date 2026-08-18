@@ -5,7 +5,7 @@ framing, no build step required. Typically 45–75% smaller, and a byte-perfect
 round trip.
 
 [![npm](https://img.shields.io/npm/v/@tech-style/json-compress.svg)](https://www.npmjs.com/package/@tech-style/json-compress)
-[![licence](https://img.shields.io/npm/l/@tech-style/json-compress.svg)](LICENSE)
+[![licence](https://img.shields.io/npm/l/@tech-style/json-compress.svg)](https://github.com/eharain/JSON-Compress/blob/main/LICENSE)
 [![no dependencies](https://img.shields.io/badge/dependencies-0-brightgreen.svg)](package.json)
 
 ```bash
@@ -112,7 +112,7 @@ The built bundles are committed to the repository, so jsDelivr serves them
 straight from GitHub. Paste this into a page and you are done:
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/eharain/JSON-Compress@v1.0.0/javascript/dist/json-compress.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/eharain/JSON-Compress@v1.0.1/javascript/dist/json-compress.min.js"></script>
 <script>
   const small = jsonCompress.compress(myData);
   const back  = jsonCompress.decompress(small);
@@ -124,7 +124,7 @@ Or as an ES module, with no global and no bundler:
 ```html
 <script type="module">
   import { compress, measure } from
-    'https://cdn.jsdelivr.net/gh/eharain/JSON-Compress@v1.0.0/javascript/dist/index.mjs';
+    'https://cdn.jsdelivr.net/gh/eharain/JSON-Compress@v1.0.1/javascript/dist/index.mjs';
 </script>
 ```
 
@@ -137,7 +137,7 @@ The same files are on the npm CDNs:
 
 The browser build is about 21 KB minified, 7 KB over the wire, and defines one
 global — `jsonCompress` — carrying the whole API. Nothing in the library touches
-the network. See [browser.md](browser.md) for version pinning, subresource
+the network. See [browser.md](https://github.com/eharain/JSON-Compress/blob/main/javascript/browser.md) for version pinning, subresource
 integrity and a complete copy-and-paste page.
 
 ---

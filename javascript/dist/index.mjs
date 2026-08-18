@@ -1,4 +1,4 @@
-/*! json-compress | MIT | https://github.com/eharain/json-compress */
+/*! @tech-style/json-compress v1.0.1 | MIT | https://github.com/eharain/JSON-Compress */
 
 // src/constants.js
 var FORMAT_VERSION = 1;

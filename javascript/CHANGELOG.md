@@ -4,6 +4,15 @@ All notable changes to `@tech-style/json-compress` are recorded here. The format
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2026-08-18
+
+### Fixed
+
+- `browser.md` is now included in the published package. It documents the CDN
+  URLs, version pinning and subresource integrity, and the README linked to it.
+- README links to files outside the package are absolute, so they resolve from
+  the registry page as well as from the repository.
+
 ## [1.0.0] - 2026-08-18
 
 First release.
@@ -33,4 +42,5 @@ First release.
 - TypeScript definitions, an ESM build, a CommonJS build and a browser global.
 - The wire format specification, in `SPEC.md` at the repository root.
 
+[1.0.1]: https://github.com/eharain/JSON-Compress/releases/tag/v1.0.1
 [1.0.0]: https://github.com/eharain/JSON-Compress/releases/tag/v1.0.0
