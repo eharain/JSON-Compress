@@ -28,7 +28,7 @@ JSON, so it travels anywhere JSON travels.
 
 | Language | Package | Status |
 |---|---|---|
-| **JavaScript / TypeScript** | [`json-compress`](https://www.npmjs.com/package/json-compress) on npm | Released — [`javascript/`](javascript/) |
+| **JavaScript / TypeScript** | [`@tech-style/json-compress`](https://www.npmjs.com/package/@tech-style/json-compress) on npm | Released — [`javascript/`](javascript/) |
 | PHP | Packagist | Planned |
 | Java | Maven Central | Planned |
 | .NET | NuGet | Planned |
@@ -87,20 +87,49 @@ earn its keep, and the tooling will tell you so before you commit.
 ## Try it
 
 ```bash
-npm install json-compress
+npm install @tech-style/json-compress
 ```
 
 ```js
-import { compress, decompress, measure } from 'json-compress';
+import { compress, decompress, measure } from '@tech-style/json-compress';
 
 const small = compress(records);
 const back = decompress(small);
 console.log(await measure(records));
 ```
 
-Or online, with nothing to install:
+### In a browser, with nothing installed
+
+The built bundles are committed here, so jsDelivr serves them straight out of
+this repository. One script tag and you have it:
+
+```html
+<script src="https://cdn.jsdelivr.net/gh/eharain/JSON-Compress@v1.0.0/javascript/dist/json-compress.min.js"></script>
+<script>
+  const small = jsonCompress.compress(myData);
+  const back  = jsonCompress.decompress(small);
+</script>
+```
+
+Or as an ES module, no bundler involved:
+
+```html
+<script type="module">
+  import { compress, measure } from
+    'https://cdn.jsdelivr.net/gh/eharain/JSON-Compress@v1.0.0/javascript/dist/index.mjs';
+</script>
+```
+
+About 7 KB over the wire. Nothing in the library touches the network — see
+[`javascript/browser.md`](javascript/browser.md) for version pinning,
+subresource integrity and a complete copy-and-paste page.
+
+### Or online, with nothing at all
+
 **[tech-style.co/json-minifier.html](https://tech-style.co/json-minifier.html)**
-— minify, beautify, validate and compress in the browser. Nothing is uploaded.
+— minify, beautify, validate and compress in the browser. That page loads the
+same bundle from the same URL above, and does all its work on your machine.
+Nothing is uploaded.
 
 ---
 

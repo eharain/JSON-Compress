@@ -2,10 +2,12 @@
 concept.txt
 results-helper.ts
 
-# Dependencies and build output
+# Dependencies
 node_modules/
 */node_modules/
-javascript/dist/
+
+# javascript/dist is deliberately committed: jsDelivr serves the browser bundle
+# straight out of the repository, so the built files have to be in it.
 
 # Editor and OS noise
 .DS_Store

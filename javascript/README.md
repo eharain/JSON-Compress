@@ -1,19 +1,19 @@
-# json-compress
+# @tech-style/json-compress
 
 **Lossless JSON compression that is still JSON.** No dependencies, no binary
 framing, no build step required. Typically 45–75% smaller, and a byte-perfect
 round trip.
 
-[![npm](https://img.shields.io/npm/v/json-compress.svg)](https://www.npmjs.com/package/json-compress)
-[![licence](https://img.shields.io/npm/l/json-compress.svg)](LICENSE)
+[![npm](https://img.shields.io/npm/v/@tech-style/json-compress.svg)](https://www.npmjs.com/package/@tech-style/json-compress)
+[![licence](https://img.shields.io/npm/l/@tech-style/json-compress.svg)](LICENSE)
 [![no dependencies](https://img.shields.io/badge/dependencies-0-brightgreen.svg)](package.json)
 
 ```bash
-npm install json-compress
+npm install @tech-style/json-compress
 ```
 
 ```js
-import { compress, decompress } from 'json-compress';
+import { compress, decompress } from '@tech-style/json-compress';
 
 const users = [
   { id: 1, name: 'Ada', role: 'admin', country: 'United Kingdom' },
@@ -43,7 +43,7 @@ records is a thousand copies of every key name; a `status` column with three
 possible values is a thousand copies of three short strings; a `currency` field
 that is always `"GBP"` is a thousand copies of one.
 
-`json-compress` writes each of those down once.
+This writes each of those down once.
 
 | | |
 |---|---|
@@ -96,24 +96,49 @@ before you commit.
 ## Install
 
 ```bash
-npm install json-compress
+npm install @tech-style/json-compress
 ```
 
 ESM, CommonJS and a browser global are all published:
 
 ```js
-import { compress, decompress } from 'json-compress';        // ESM
-const { compress, decompress } = require('json-compress');   // CommonJS
+import { compress, decompress } from '@tech-style/json-compress';        // ESM
+const { compress, decompress } = require('@tech-style/json-compress');   // CommonJS
 ```
 
+### Or nothing installed at all
+
+The built bundles are committed to the repository, so jsDelivr serves them
+straight from GitHub. Paste this into a page and you are done:
+
 ```html
-<script src="https://unpkg.com/json-compress/dist/json-compress.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/eharain/JSON-Compress@v1.0.0/javascript/dist/json-compress.min.js"></script>
 <script>
   const small = jsonCompress.compress(myData);
+  const back  = jsonCompress.decompress(small);
 </script>
 ```
 
-The browser build is about 21 KB minified, 7 KB over the wire.
+Or as an ES module, with no global and no bundler:
+
+```html
+<script type="module">
+  import { compress, measure } from
+    'https://cdn.jsdelivr.net/gh/eharain/JSON-Compress@v1.0.0/javascript/dist/index.mjs';
+</script>
+```
+
+The same files are on the npm CDNs:
+
+```html
+<script src="https://unpkg.com/@tech-style/json-compress/dist/json-compress.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tech-style/json-compress/dist/json-compress.min.js"></script>
+```
+
+The browser build is about 21 KB minified, 7 KB over the wire, and defines one
+global — `jsonCompress` — carrying the whole API. Nothing in the library touches
+the network. See [browser.md](browser.md) for version pinning, subresource
+integrity and a complete copy-and-paste page.
 
 ---
 
@@ -267,15 +292,16 @@ combination of the options above.
 ## Command line
 
 ```bash
-npx json-compress stats orders.json
-npx json-compress compress orders.json -o orders.min.json
-npx json-compress decompress orders.min.json --pretty
-curl -s https://api.example.com/orders | npx json-compress compress > orders.jc.json
+npx @tech-style/json-compress stats orders.json
+npx @tech-style/json-compress compress orders.json -o orders.min.json
+npx @tech-style/json-compress decompress orders.min.json --pretty
+curl -s https://api.example.com/orders | npx @tech-style/json-compress compress > orders.jc.json
 ```
 
 `stats` changes nothing and reports what compression would save, with and
 without gzip. `validate`, `minify` and `beautify` are there too. Run
-`json-compress --help` for the full list.
+`json-compress --help` for the full list. Once the package is installed, the
+binary is called `json-compress` without the scope.
 
 ---
 
