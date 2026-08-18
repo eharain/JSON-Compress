@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFrameworks>net8.0;net10.0</TargetFrameworks>
+    <RootNamespace>TechStyle.JsonCompress.Cli</RootNamespace>
+    <AssemblyName>json-compress</AssemblyName>
+    <Nullable>enable</Nullable>
+    <InvariantGlobalization>true</InvariantGlobalization>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>json-compress</ToolCommandName>
+    <PackageId>TechStyle.JsonCompress.Cli</PackageId>
+    <Title>json-compress command line</Title>
+    <Description>Command line for json-compress: compress, restore, measure, minify, beautify and validate JSON documents. Install with dotnet tool install --global TechStyle.JsonCompress.Cli.</Description>
+    <PackageTags>json;compress;cli;dotnet-tool;minify;validate</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\TechStyle.JsonCompress\TechStyle.JsonCompress.csproj" />
+  </ItemGroup>
+
+</Project>

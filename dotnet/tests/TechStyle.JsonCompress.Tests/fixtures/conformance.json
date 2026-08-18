@@ -1,0 +1,841 @@
+{
+  "note": "Produced by dotnet/tests/interop/generate-fixtures.mjs from the JavaScript implementation. Each case carries a source document and the envelope the JavaScript encoder wrote for it, both as text.",
+  "format": 1,
+  "cases": [
+    {
+      "name": "spec worked example",
+      "source": "[{\"id\":1,\"name\":\"Ada\",\"role\":\"admin\",\"team\":\"core\"},{\"id\":2,\"name\":\"Bob\",\"role\":\"admin\",\"team\":\"core\"},{\"id\":3,\"name\":\"Cy\",\"role\":\"user\",\"team\":\"core\"},{\"id\":4,\"name\":\"Dee\",\"role\":\"user\",\"team\":\"core\",\"note\":\"on leave\"}]",
+      "compressed": "{\"jc\":1,\"k\":[\"id\",\"name\",\"role\",\"team\",\"note\"],\"s\":[\"admin\",\"user\"],\"d\":{\"~t\":[0,1,2,3,4],\"~e\":[0,0,1,2,0],\"~cv\":[\"core\"],\"~r\":[[1,\"Ada\",0],[2,\"Bob\",0],[3,\"Cy\",1],[4,\"Dee\",1,\"on leave\"]]}}"
+    },
+    {
+      "name": "spec key catalogue example",
+      "source": "{\"user\":{\"id\":7,\"name\":\"Ada\",\"tags\":[\"a\",\"b\"]}}",
+      "compressed": "{\"jc\":1,\"k\":[\"user\",\"id\",\"name\",\"tags\"],\"d\":{\"A\":{\"B\":7,\"C\":\"Ada\",\"D\":[\"a\",\"b\"]}}}"
+    },
+    {
+      "name": "tilde escape",
+      "source": "[\"~\",\"~~\",\"~~~\",\"~0\",\"~z\",\"~ref\",\"~t\",\"a~b\"]",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":[\"~~\",\"~~~\",\"~~~~\",\"~~0\",\"~~z\",\"~~ref\",\"~~t\",\"a~b\"]}"
+    },
+    {
+      "name": "tilde in key and value",
+      "source": "{\"~key\":\"~value\",\"~t\":1,\"~r\":2}",
+      "compressed": "{\"jc\":1,\"k\":[\"~key\",\"~t\",\"~r\"],\"d\":{\"A\":\"~~value\",\"B\":1,\"C\":2}}"
+    },
+    {
+      "name": "holes against nulls",
+      "source": "[{\"a\":1,\"b\":null},{\"a\":2},{\"a\":3,\"b\":null},{\"a\":4,\"b\":5}]",
+      "compressed": "{\"jc\":1,\"k\":[\"a\",\"b\"],\"d\":{\"~t\":[0,1],\"~r\":[[1,null],[2],[3,null],[4,5]]}}"
+    },
+    {
+      "name": "holes against nulls in a dictionary column",
+      "source": "[{\"k\":\"x\",\"n\":1},{\"k\":null,\"n\":2},{\"n\":3},{\"k\":\"x\",\"n\":4},{\"k\":\"y\",\"n\":5},{\"k\":\"x\",\"n\":6}]",
+      "compressed": "{\"jc\":1,\"k\":[\"k\",\"n\"],\"d\":{\"~t\":[0,1],\"~r\":[[\"x\",1],[null,2],[\"~\",3],[\"x\",4],[\"y\",5],[\"x\",6]]}}"
+    },
+    {
+      "name": "every column constant",
+      "source": "[{\"a\":1,\"b\":\"x\"},{\"a\":1,\"b\":\"x\"},{\"a\":1,\"b\":\"x\"},{\"a\":1,\"b\":\"x\"}]",
+      "compressed": "{\"jc\":1,\"k\":[\"a\",\"b\"],\"d\":{\"~t\":[0,1],\"~e\":[2,2],\"~cv\":[1,\"x\"],\"~n\":4}}"
+    },
+    {
+      "name": "proto as a key",
+      "source": "{\"__proto__\":1,\"safe\":2}",
+      "compressed": "{\"jc\":1,\"k\":[\"__proto__\",\"safe\"],\"d\":{\"A\":1,\"B\":2}}"
+    },
+    {
+      "name": "proto as a column",
+      "source": "[{\"__proto__\":1,\"a\":2},{\"__proto__\":3,\"a\":4},{\"__proto__\":5,\"a\":6}]",
+      "compressed": "{\"jc\":1,\"k\":[\"__proto__\",\"a\"],\"d\":{\"~t\":[0,1],\"~r\":[[1,2],[3,4],[5,6]]}}"
+    },
+    {
+      "name": "token-shaped keys",
+      "source": "{\"0\":1,\"1\":2,\"10\":5,\"a\":3,\"z\":4,\"~t\":6,\"~r\":7}",
+      "compressed": "{\"jc\":1,\"k\":[\"0\",\"1\",\"10\",\"a\",\"z\",\"~t\",\"~r\"],\"d\":{\"A\":1,\"B\":2,\"C\":5,\"D\":3,\"E\":4,\"F\":6,\"G\":7}}"
+    },
+    {
+      "name": "rows whose key orders disagree",
+      "source": "[{\"a\":1,\"b\":2},{\"b\":3,\"a\":4}]",
+      "compressed": "{\"jc\":1,\"k\":[\"a\",\"b\"],\"d\":[{\"A\":1,\"B\":2},{\"B\":3,\"A\":4}]}"
+    },
+    {
+      "name": "rows whose key orders can be reconciled",
+      "source": "[{\"a\":1,\"b\":2},{\"c\":3,\"a\":4}]",
+      "compressed": "{\"jc\":1,\"k\":[\"a\",\"b\",\"c\"],\"d\":[{\"A\":1,\"B\":2},{\"C\":3,\"A\":4}]}"
+    },
+    {
+      "name": "ragged rows",
+      "source": "[{\"a\":1,\"b\":2,\"c\":3},{\"a\":4},{\"a\":5,\"c\":6}]",
+      "compressed": "{\"jc\":1,\"k\":[\"a\",\"c\",\"b\"],\"d\":[{\"A\":1,\"C\":2,\"B\":3},{\"A\":4},{\"A\":5,\"B\":6}]}"
+    },
+    {
+      "name": "empty containers",
+      "source": "[[],{},[[]],[{}]]",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":[[],{},[[]],[{}]]}"
+    },
+    {
+      "name": "array of empty objects",
+      "source": "[{},{},{}]",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":[{},{},{}]}"
+    },
+    {
+      "name": "nested tables",
+      "source": "{\"groups\":[{\"name\":\"a\",\"items\":[{\"q\":1,\"p\":2},{\"q\":3,\"p\":4}]},{\"name\":\"b\",\"items\":[{\"q\":5,\"p\":6},{\"q\":7,\"p\":8}]}]}",
+      "compressed": "{\"jc\":1,\"k\":[\"q\",\"p\",\"groups\",\"name\",\"items\"],\"d\":{\"C\":{\"~t\":[3,4],\"~r\":[[\"a\",{\"~t\":[0,1],\"~r\":[[1,2],[3,4]]}],[\"b\",{\"~t\":[0,1],\"~r\":[[5,6],[7,8]]}]]}}}"
+    },
+    {
+      "name": "arrays of arrays",
+      "source": "[[1,2],[3,4],[5,6]]",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":[[1,2],[3,4],[5,6]]}"
+    },
+    {
+      "name": "mixed array",
+      "source": "[1,\"two\",null,{\"three\":3},[4]]",
+      "compressed": "{\"jc\":1,\"k\":[\"three\"],\"d\":[1,\"two\",null,{\"A\":3},[4]]}"
+    },
+    {
+      "name": "unicode and escapes",
+      "source": "{\"emoji\":\"compressed 📦 nicely\",\"quote\":\"she said \\\"hello\\\"\",\"backslash\":\"C:\\\\Users\\\\path\",\"newline\":\"one\\ntwo\\tthree\",\"surrogate\":\"😀😁\",\"arabic\":\"مرحبا بالعالم\",\"nul\":\"a\\u0000b\"}",
+      "compressed": "{\"jc\":1,\"k\":[\"emoji\",\"quote\",\"backslash\",\"newline\",\"surrogate\",\"arabic\",\"nul\"],\"d\":{\"A\":\"compressed 📦 nicely\",\"B\":\"she said \\\"hello\\\"\",\"C\":\"C:\\\\Users\\\\path\",\"D\":\"one\\ntwo\\tthree\",\"E\":\"😀😁\",\"F\":\"مرحبا بالعالم\",\"G\":\"a\\u0000b\"}}"
+    },
+    {
+      "name": "a large key set",
+      "source": "{\"key_number_0\":0,\"key_number_1\":1,\"key_number_2\":2,\"key_number_3\":3,\"key_number_4\":4,\"key_number_5\":5,\"key_number_6\":6,\"key_number_7\":7,\"key_number_8\":8,\"key_number_9\":9,\"key_number_10\":10,\"key_number_11\":11,\"key_number_12\":12,\"key_number_13\":13,\"key_number_14\":14,\"key_number_15\":15,\"key_number_16\":16,\"key_number_17\":17,\"key_number_18\":18,\"key_number_19\":19,\"key_number_20\":20,\"key_number_21\":21,\"key_number_22\":22,\"key_number_23\":23,\"key_number_24\":24,\"key_number_25\":25,\"key_number_26\":26,\"key_number_27\":27,\"key_number_28\":28,\"key_number_29\":29,\"key_number_30\":30,\"key_number_31\":31,\"key_number_32\":32,\"key_number_33\":33,\"key_number_34\":34,\"key_number_35\":35,\"key_number_36\":36,\"key_number_37\":37,\"key_number_38\":38,\"key_number_39\":39,\"key_number_40\":40,\"key_number_41\":41,\"key_number_42\":42,\"key_number_43\":43,\"key_number_44\":44,\"key_number_45\":45,\"key_number_46\":46,\"key_number_47\":47,\"key_number_48\":48,\"key_number_49\":49,\"key_number_50\":50,\"key_number_51\":51,\"key_number_52\":52,\"key_number_53\":53,\"key_number_54\":54,\"key_number_55\":55,\"key_number_56\":56,\"key_number_57\":57,\"key_number_58\":58,\"key_number_59\":59,\"key_number_60\":60,\"key_number_61\":61,\"key_number_62\":62,\"key_number_63\":63,\"key_number_64\":64,\"key_number_65\":65,\"key_number_66\":66,\"key_number_67\":67,\"key_number_68\":68,\"key_number_69\":69,\"key_number_70\":70,\"key_number_71\":71,\"key_number_72\":72,\"key_number_73\":73,\"key_number_74\":74,\"key_number_75\":75,\"key_number_76\":76,\"key_number_77\":77,\"key_number_78\":78,\"key_number_79\":79,\"key_number_80\":80,\"key_number_81\":81,\"key_number_82\":82,\"key_number_83\":83,\"key_number_84\":84,\"key_number_85\":85,\"key_number_86\":86,\"key_number_87\":87,\"key_number_88\":88,\"key_number_89\":89,\"key_number_90\":90,\"key_number_91\":91,\"key_number_92\":92,\"key_number_93\":93,\"key_number_94\":94,\"key_number_95\":95,\"key_number_96\":96,\"key_number_97\":97,\"key_number_98\":98,\"key_number_99\":99,\"key_number_100\":100,\"key_number_101\":101,\"key_number_102\":102,\"key_number_103\":103,\"key_number_104\":104,\"key_number_105\":105,\"key_number_106\":106,\"key_number_107\":107,\"key_number_108\":108,\"key_number_109\":109,\"key_number_110\":110,\"key_number_111\":111,\"key_number_112\":112,\"key_number_113\":113,\"key_number_114\":114,\"key_number_115\":115,\"key_number_116\":116,\"key_number_117\":117,\"key_number_118\":118,\"key_number_119\":119,\"key_number_120\":120,\"key_number_121\":121,\"key_number_122\":122,\"key_number_123\":123,\"key_number_124\":124,\"key_number_125\":125,\"key_number_126\":126,\"key_number_127\":127,\"key_number_128\":128,\"key_number_129\":129,\"key_number_130\":130,\"key_number_131\":131,\"key_number_132\":132,\"key_number_133\":133,\"key_number_134\":134,\"key_number_135\":135,\"key_number_136\":136,\"key_number_137\":137,\"key_number_138\":138,\"key_number_139\":139,\"key_number_140\":140,\"key_number_141\":141,\"key_number_142\":142,\"key_number_143\":143,\"key_number_144\":144,\"key_number_145\":145,\"key_number_146\":146,\"key_number_147\":147,\"key_number_148\":148,\"key_number_149\":149,\"key_number_150\":150,\"key_number_151\":151,\"key_number_152\":152,\"key_number_153\":153,\"key_number_154\":154,\"key_number_155\":155,\"key_number_156\":156,\"key_number_157\":157,\"key_number_158\":158,\"key_number_159\":159,\"key_number_160\":160,\"key_number_161\":161,\"key_number_162\":162,\"key_number_163\":163,\"key_number_164\":164,\"key_number_165\":165,\"key_number_166\":166,\"key_number_167\":167,\"key_number_168\":168,\"key_number_169\":169,\"key_number_170\":170,\"key_number_171\":171,\"key_number_172\":172,\"key_number_173\":173,\"key_number_174\":174,\"key_number_175\":175,\"key_number_176\":176,\"key_number_177\":177,\"key_number_178\":178,\"key_number_179\":179,\"key_number_180\":180,\"key_number_181\":181,\"key_number_182\":182,\"key_number_183\":183,\"key_number_184\":184,\"key_number_185\":185,\"key_number_186\":186,\"key_number_187\":187,\"key_number_188\":188,\"key_number_189\":189,\"key_number_190\":190,\"key_number_191\":191,\"key_number_192\":192,\"key_number_193\":193,\"key_number_194\":194,\"key_number_195\":195,\"key_number_196\":196,\"key_number_197\":197,\"key_number_198\":198,\"key_number_199\":199}",
+      "compressed": "{\"jc\":1,\"k\":[\"key_number_0\",\"key_number_1\",\"key_number_2\",\"key_number_3\",\"key_number_4\",\"key_number_5\",\"key_number_6\",\"key_number_7\",\"key_number_8\",\"key_number_9\",\"key_number_10\",\"key_number_11\",\"key_number_12\",\"key_number_13\",\"key_number_14\",\"key_number_15\",\"key_number_16\",\"key_number_17\",\"key_number_18\",\"key_number_19\",\"key_number_20\",\"key_number_21\",\"key_number_22\",\"key_number_23\",\"key_number_24\",\"key_number_25\",\"key_number_26\",\"key_number_27\",\"key_number_28\",\"key_number_29\",\"key_number_30\",\"key_number_31\",\"key_number_32\",\"key_number_33\",\"key_number_34\",\"key_number_35\",\"key_number_36\",\"key_number_37\",\"key_number_38\",\"key_number_39\",\"key_number_40\",\"key_number_41\",\"key_number_42\",\"key_number_43\",\"key_number_44\",\"key_number_45\",\"key_number_46\",\"key_number_47\",\"key_number_48\",\"key_number_49\",\"key_number_50\",\"key_number_51\",\"key_number_52\",\"key_number_53\",\"key_number_54\",\"key_number_55\",\"key_number_56\",\"key_number_57\",\"key_number_58\",\"key_number_59\",\"key_number_60\",\"key_number_61\",\"key_number_62\",\"key_number_63\",\"key_number_64\",\"key_number_65\",\"key_number_66\",\"key_number_67\",\"key_number_68\",\"key_number_69\",\"key_number_70\",\"key_number_71\",\"key_number_72\",\"key_number_73\",\"key_number_74\",\"key_number_75\",\"key_number_76\",\"key_number_77\",\"key_number_78\",\"key_number_79\",\"key_number_80\",\"key_number_81\",\"key_number_82\",\"key_number_83\",\"key_number_84\",\"key_number_85\",\"key_number_86\",\"key_number_87\",\"key_number_88\",\"key_number_89\",\"key_number_90\",\"key_number_91\",\"key_number_92\",\"key_number_93\",\"key_number_94\",\"key_number_95\",\"key_number_96\",\"key_number_97\",\"key_number_98\",\"key_number_99\",\"key_number_100\",\"key_number_101\",\"key_number_102\",\"key_number_103\",\"key_number_104\",\"key_number_105\",\"key_number_106\",\"key_number_107\",\"key_number_108\",\"key_number_109\",\"key_number_110\",\"key_number_111\",\"key_number_112\",\"key_number_113\",\"key_number_114\",\"key_number_115\",\"key_number_116\",\"key_number_117\",\"key_number_118\",\"key_number_119\",\"key_number_120\",\"key_number_121\",\"key_number_122\",\"key_number_123\",\"key_number_124\",\"key_number_125\",\"key_number_126\",\"key_number_127\",\"key_number_128\",\"key_number_129\",\"key_number_130\",\"key_number_131\",\"key_number_132\",\"key_number_133\",\"key_number_134\",\"key_number_135\",\"key_number_136\",\"key_number_137\",\"key_number_138\",\"key_number_139\",\"key_number_140\",\"key_number_141\",\"key_number_142\",\"key_number_143\",\"key_number_144\",\"key_number_145\",\"key_number_146\",\"key_number_147\",\"key_number_148\",\"key_number_149\",\"key_number_150\",\"key_number_151\",\"key_number_152\",\"key_number_153\",\"key_number_154\",\"key_number_155\",\"key_number_156\",\"key_number_157\",\"key_number_158\",\"key_number_159\",\"key_number_160\",\"key_number_161\",\"key_number_162\",\"key_number_163\",\"key_number_164\",\"key_number_165\",\"key_number_166\",\"key_number_167\",\"key_number_168\",\"key_number_169\",\"key_number_170\",\"key_number_171\",\"key_number_172\",\"key_number_173\",\"key_number_174\",\"key_number_175\",\"key_number_176\",\"key_number_177\",\"key_number_178\",\"key_number_179\",\"key_number_180\",\"key_number_181\",\"key_number_182\",\"key_number_183\",\"key_number_184\",\"key_number_185\",\"key_number_186\",\"key_number_187\",\"key_number_188\",\"key_number_189\",\"key_number_190\",\"key_number_191\",\"key_number_192\",\"key_number_193\",\"key_number_194\",\"key_number_195\",\"key_number_196\",\"key_number_197\",\"key_number_198\",\"key_number_199\"],\"d\":{\"A\":0,\"B\":1,\"C\":2,\"D\":3,\"E\":4,\"F\":5,\"G\":6,\"H\":7,\"I\":8,\"J\":9,\"K\":10,\"L\":11,\"M\":12,\"N\":13,\"O\":14,\"P\":15,\"Q\":16,\"R\":17,\"S\":18,\"T\":19,\"U\":20,\"V\":21,\"W\":22,\"X\":23,\"Y\":24,\"Z\":25,\"a\":26,\"b\":27,\"c\":28,\"d\":29,\"e\":30,\"f\":31,\"g\":32,\"h\":33,\"i\":34,\"j\":35,\"k\":36,\"l\":37,\"m\":38,\"n\":39,\"o\":40,\"p\":41,\"q\":42,\"r\":43,\"s\":44,\"t\":45,\"u\":46,\"v\":47,\"w\":48,\"x\":49,\"y\":50,\"z\":51,\"A0\":52,\"A1\":53,\"A2\":54,\"A3\":55,\"A4\":56,\"A5\":57,\"A6\":58,\"A7\":59,\"A8\":60,\"A9\":61,\"AA\":62,\"AB\":63,\"AC\":64,\"AD\":65,\"AE\":66,\"AF\":67,\"AG\":68,\"AH\":69,\"AI\":70,\"AJ\":71,\"AK\":72,\"AL\":73,\"AM\":74,\"AN\":75,\"AO\":76,\"AP\":77,\"AQ\":78,\"AR\":79,\"AS\":80,\"AT\":81,\"AU\":82,\"AV\":83,\"AW\":84,\"AX\":85,\"AY\":86,\"AZ\":87,\"Aa\":88,\"Ab\":89,\"Ac\":90,\"Ad\":91,\"Ae\":92,\"Af\":93,\"Ag\":94,\"Ah\":95,\"Ai\":96,\"Aj\":97,\"Ak\":98,\"Al\":99,\"Am\":100,\"An\":101,\"Ao\":102,\"Ap\":103,\"Aq\":104,\"Ar\":105,\"As\":106,\"At\":107,\"Au\":108,\"Av\":109,\"Aw\":110,\"Ax\":111,\"Ay\":112,\"Az\":113,\"B0\":114,\"B1\":115,\"B2\":116,\"B3\":117,\"B4\":118,\"B5\":119,\"B6\":120,\"B7\":121,\"B8\":122,\"B9\":123,\"BA\":124,\"BB\":125,\"BC\":126,\"BD\":127,\"BE\":128,\"BF\":129,\"BG\":130,\"BH\":131,\"BI\":132,\"BJ\":133,\"BK\":134,\"BL\":135,\"BM\":136,\"BN\":137,\"BO\":138,\"BP\":139,\"BQ\":140,\"BR\":141,\"BS\":142,\"BT\":143,\"BU\":144,\"BV\":145,\"BW\":146,\"BX\":147,\"BY\":148,\"BZ\":149,\"Ba\":150,\"Bb\":151,\"Bc\":152,\"Bd\":153,\"Be\":154,\"Bf\":155,\"Bg\":156,\"Bh\":157,\"Bi\":158,\"Bj\":159,\"Bk\":160,\"Bl\":161,\"Bm\":162,\"Bn\":163,\"Bo\":164,\"Bp\":165,\"Bq\":166,\"Br\":167,\"Bs\":168,\"Bt\":169,\"Bu\":170,\"Bv\":171,\"Bw\":172,\"Bx\":173,\"By\":174,\"Bz\":175,\"C0\":176,\"C1\":177,\"C2\":178,\"C3\":179,\"C4\":180,\"C5\":181,\"C6\":182,\"C7\":183,\"C8\":184,\"C9\":185,\"CA\":186,\"CB\":187,\"CC\":188,\"CD\":189,\"CE\":190,\"CF\":191,\"CG\":192,\"CH\":193,\"CI\":194,\"CJ\":195,\"CK\":196,\"CL\":197,\"CM\":198,\"CN\":199}}"
+    },
+    {
+      "name": "a large string catalogue",
+      "source": "[\"a distinctive value number 0\",\"a distinctive value number 1\",\"a distinctive value number 2\",\"a distinctive value number 3\",\"a distinctive value number 4\",\"a distinctive value number 5\",\"a distinctive value number 6\",\"a distinctive value number 7\",\"a distinctive value number 8\",\"a distinctive value number 9\",\"a distinctive value number 10\",\"a distinctive value number 11\",\"a distinctive value number 12\",\"a distinctive value number 13\",\"a distinctive value number 14\",\"a distinctive value number 15\",\"a distinctive value number 16\",\"a distinctive value number 17\",\"a distinctive value number 18\",\"a distinctive value number 19\",\"a distinctive value number 20\",\"a distinctive value number 21\",\"a distinctive value number 22\",\"a distinctive value number 23\",\"a distinctive value number 24\",\"a distinctive value number 25\",\"a distinctive value number 26\",\"a distinctive value number 27\",\"a distinctive value number 28\",\"a distinctive value number 29\",\"a distinctive value number 30\",\"a distinctive value number 31\",\"a distinctive value number 32\",\"a distinctive value number 33\",\"a distinctive value number 34\",\"a distinctive value number 35\",\"a distinctive value number 36\",\"a distinctive value number 37\",\"a distinctive value number 38\",\"a distinctive value number 39\",\"a distinctive value number 40\",\"a distinctive value number 41\",\"a distinctive value number 42\",\"a distinctive value number 43\",\"a distinctive value number 44\",\"a distinctive value number 45\",\"a distinctive value number 46\",\"a distinctive value number 47\",\"a distinctive value number 48\",\"a distinctive value number 49\",\"a distinctive value number 50\",\"a distinctive value number 51\",\"a distinctive value number 52\",\"a distinctive value number 53\",\"a distinctive value number 54\",\"a distinctive value number 55\",\"a distinctive value number 56\",\"a distinctive value number 57\",\"a distinctive value number 58\",\"a distinctive value number 59\",\"a distinctive value number 60\",\"a distinctive value number 61\",\"a distinctive value number 62\",\"a distinctive value number 63\",\"a distinctive value number 64\",\"a distinctive value number 65\",\"a distinctive value number 66\",\"a distinctive value number 67\",\"a distinctive value number 68\",\"a distinctive value number 69\",\"a distinctive value number 70\",\"a distinctive value number 71\",\"a distinctive value number 72\",\"a distinctive value number 73\",\"a distinctive value number 74\",\"a distinctive value number 75\",\"a distinctive value number 76\",\"a distinctive value number 77\",\"a distinctive value number 78\",\"a distinctive value number 79\",\"a distinctive value number 80\",\"a distinctive value number 81\",\"a distinctive value number 82\",\"a distinctive value number 83\",\"a distinctive value number 84\",\"a distinctive value number 85\",\"a distinctive value number 86\",\"a distinctive value number 87\",\"a distinctive value number 88\",\"a distinctive value number 89\",\"a distinctive value number 90\",\"a distinctive value number 91\",\"a distinctive value number 92\",\"a distinctive value number 93\",\"a distinctive value number 94\",\"a distinctive value number 95\",\"a distinctive value number 96\",\"a distinctive value number 97\",\"a distinctive value number 98\",\"a distinctive value number 99\",\"a distinctive value number 100\",\"a distinctive value number 101\",\"a distinctive value number 102\",\"a distinctive value number 103\",\"a distinctive value number 104\",\"a distinctive value number 105\",\"a distinctive value number 106\",\"a distinctive value number 107\",\"a distinctive value number 108\",\"a distinctive value number 109\",\"a distinctive value number 110\",\"a distinctive value number 111\",\"a distinctive value number 112\",\"a distinctive value number 113\",\"a distinctive value number 114\",\"a distinctive value number 115\",\"a distinctive value number 116\",\"a distinctive value number 117\",\"a distinctive value number 118\",\"a distinctive value number 119\",\"a distinctive value number 0\",\"a distinctive value number 1\",\"a distinctive value number 2\",\"a distinctive value number 3\",\"a distinctive value number 4\",\"a distinctive value number 5\",\"a distinctive value number 6\",\"a distinctive value number 7\",\"a distinctive value number 8\",\"a distinctive value number 9\",\"a distinctive value number 10\",\"a distinctive value number 11\",\"a distinctive value number 12\",\"a distinctive value number 13\",\"a distinctive value number 14\",\"a distinctive value number 15\",\"a distinctive value number 16\",\"a distinctive value number 17\",\"a distinctive value number 18\",\"a distinctive value number 19\",\"a distinctive value number 20\",\"a distinctive value number 21\",\"a distinctive value number 22\",\"a distinctive value number 23\",\"a distinctive value number 24\",\"a distinctive value number 25\",\"a distinctive value number 26\",\"a distinctive value number 27\",\"a distinctive value number 28\",\"a distinctive value number 29\",\"a distinctive value number 30\",\"a distinctive value number 31\",\"a distinctive value number 32\",\"a distinctive value number 33\",\"a distinctive value number 34\",\"a distinctive value number 35\",\"a distinctive value number 36\",\"a distinctive value number 37\",\"a distinctive value number 38\",\"a distinctive value number 39\",\"a distinctive value number 40\",\"a distinctive value number 41\",\"a distinctive value number 42\",\"a distinctive value number 43\",\"a distinctive value number 44\",\"a distinctive value number 45\",\"a distinctive value number 46\",\"a distinctive value number 47\",\"a distinctive value number 48\",\"a distinctive value number 49\",\"a distinctive value number 50\",\"a distinctive value number 51\",\"a distinctive value number 52\",\"a distinctive value number 53\",\"a distinctive value number 54\",\"a distinctive value number 55\",\"a distinctive value number 56\",\"a distinctive value number 57\",\"a distinctive value number 58\",\"a distinctive value number 59\",\"a distinctive value number 60\",\"a distinctive value number 61\",\"a distinctive value number 62\",\"a distinctive value number 63\",\"a distinctive value number 64\",\"a distinctive value number 65\",\"a distinctive value number 66\",\"a distinctive value number 67\",\"a distinctive value number 68\",\"a distinctive value number 69\",\"a distinctive value number 70\",\"a distinctive value number 71\",\"a distinctive value number 72\",\"a distinctive value number 73\",\"a distinctive value number 74\",\"a distinctive value number 75\",\"a distinctive value number 76\",\"a distinctive value number 77\",\"a distinctive value number 78\",\"a distinctive value number 79\",\"a distinctive value number 80\",\"a distinctive value number 81\",\"a distinctive value number 82\",\"a distinctive value number 83\",\"a distinctive value number 84\",\"a distinctive value number 85\",\"a distinctive value number 86\",\"a distinctive value number 87\",\"a distinctive value number 88\",\"a distinctive value number 89\",\"a distinctive value number 90\",\"a distinctive value number 91\",\"a distinctive value number 92\",\"a distinctive value number 93\",\"a distinctive value number 94\",\"a distinctive value number 95\",\"a distinctive value number 96\",\"a distinctive value number 97\",\"a distinctive value number 98\",\"a distinctive value number 99\",\"a distinctive value number 100\",\"a distinctive value number 101\",\"a distinctive value number 102\",\"a distinctive value number 103\",\"a distinctive value number 104\",\"a distinctive value number 105\",\"a distinctive value number 106\",\"a distinctive value number 107\",\"a distinctive value number 108\",\"a distinctive value number 109\",\"a distinctive value number 110\",\"a distinctive value number 111\",\"a distinctive value number 112\",\"a distinctive value number 113\",\"a distinctive value number 114\",\"a distinctive value number 115\",\"a distinctive value number 116\",\"a distinctive value number 117\",\"a distinctive value number 118\",\"a distinctive value number 119\"]",
+      "compressed": "{\"jc\":1,\"k\":[],\"s\":[\"a distinctive value number 100\",\"a distinctive value number 101\",\"a distinctive value number 102\",\"a distinctive value number 103\",\"a distinctive value number 104\",\"a distinctive value number 105\",\"a distinctive value number 106\",\"a distinctive value number 107\",\"a distinctive value number 108\",\"a distinctive value number 109\",\"a distinctive value number 110\",\"a distinctive value number 111\",\"a distinctive value number 112\",\"a distinctive value number 113\",\"a distinctive value number 114\",\"a distinctive value number 115\",\"a distinctive value number 116\",\"a distinctive value number 117\",\"a distinctive value number 118\",\"a distinctive value number 119\",\"a distinctive value number 10\",\"a distinctive value number 11\",\"a distinctive value number 12\",\"a distinctive value number 13\",\"a distinctive value number 14\",\"a distinctive value number 15\",\"a distinctive value number 16\",\"a distinctive value number 17\",\"a distinctive value number 18\",\"a distinctive value number 19\",\"a distinctive value number 20\",\"a distinctive value number 21\",\"a distinctive value number 22\",\"a distinctive value number 23\",\"a distinctive value number 24\",\"a distinctive value number 25\",\"a distinctive value number 26\",\"a distinctive value number 27\",\"a distinctive value number 28\",\"a distinctive value number 29\",\"a distinctive value number 30\",\"a distinctive value number 31\",\"a distinctive value number 32\",\"a distinctive value number 33\",\"a distinctive value number 34\",\"a distinctive value number 35\",\"a distinctive value number 36\",\"a distinctive value number 37\",\"a distinctive value number 38\",\"a distinctive value number 39\",\"a distinctive value number 40\",\"a distinctive value number 41\",\"a distinctive value number 42\",\"a distinctive value number 43\",\"a distinctive value number 44\",\"a distinctive value number 45\",\"a distinctive value number 46\",\"a distinctive value number 47\",\"a distinctive value number 48\",\"a distinctive value number 49\",\"a distinctive value number 50\",\"a distinctive value number 51\",\"a distinctive value number 52\",\"a distinctive value number 53\",\"a distinctive value number 54\",\"a distinctive value number 55\",\"a distinctive value number 56\",\"a distinctive value number 57\",\"a distinctive value number 58\",\"a distinctive value number 59\",\"a distinctive value number 60\",\"a distinctive value number 61\",\"a distinctive value number 62\",\"a distinctive value number 63\",\"a distinctive value number 64\",\"a distinctive value number 65\",\"a distinctive value number 66\",\"a distinctive value number 67\",\"a distinctive value number 68\",\"a distinctive value number 69\",\"a distinctive value number 70\",\"a distinctive value number 71\",\"a distinctive value number 72\",\"a distinctive value number 73\",\"a distinctive value number 74\",\"a distinctive value number 75\",\"a distinctive value number 76\",\"a distinctive value number 77\",\"a distinctive value number 78\",\"a distinctive value number 79\",\"a distinctive value number 80\",\"a distinctive value number 81\",\"a distinctive value number 82\",\"a distinctive value number 83\",\"a distinctive value number 84\",\"a distinctive value number 85\",\"a distinctive value number 86\",\"a distinctive value number 87\",\"a distinctive value number 88\",\"a distinctive value number 89\",\"a distinctive value number 90\",\"a distinctive value number 91\",\"a distinctive value number 92\",\"a distinctive value number 93\",\"a distinctive value number 94\",\"a distinctive value number 95\",\"a distinctive value number 96\",\"a distinctive value number 97\",\"a distinctive value number 98\",\"a distinctive value number 99\",\"a distinctive value number 0\",\"a distinctive value number 1\",\"a distinctive value number 2\",\"a distinctive value number 3\",\"a distinctive value number 4\",\"a distinctive value number 5\",\"a distinctive value number 6\",\"a distinctive value number 7\",\"a distinctive value number 8\",\"a distinctive value number 9\"],\"d\":[\"~1m\",\"~1n\",\"~1o\",\"~1p\",\"~1q\",\"~1r\",\"~1s\",\"~1t\",\"~1u\",\"~1v\",\"~K\",\"~L\",\"~M\",\"~N\",\"~O\",\"~P\",\"~Q\",\"~R\",\"~S\",\"~T\",\"~U\",\"~V\",\"~W\",\"~X\",\"~Y\",\"~Z\",\"~a\",\"~b\",\"~c\",\"~d\",\"~e\",\"~f\",\"~g\",\"~h\",\"~i\",\"~j\",\"~k\",\"~l\",\"~m\",\"~n\",\"~o\",\"~p\",\"~q\",\"~r\",\"~s\",\"~t\",\"~u\",\"~v\",\"~w\",\"~x\",\"~y\",\"~z\",\"~10\",\"~11\",\"~12\",\"~13\",\"~14\",\"~15\",\"~16\",\"~17\",\"~18\",\"~19\",\"~1A\",\"~1B\",\"~1C\",\"~1D\",\"~1E\",\"~1F\",\"~1G\",\"~1H\",\"~1I\",\"~1J\",\"~1K\",\"~1L\",\"~1M\",\"~1N\",\"~1O\",\"~1P\",\"~1Q\",\"~1R\",\"~1S\",\"~1T\",\"~1U\",\"~1V\",\"~1W\",\"~1X\",\"~1Y\",\"~1Z\",\"~1a\",\"~1b\",\"~1c\",\"~1d\",\"~1e\",\"~1f\",\"~1g\",\"~1h\",\"~1i\",\"~1j\",\"~1k\",\"~1l\",\"~0\",\"~1\",\"~2\",\"~3\",\"~4\",\"~5\",\"~6\",\"~7\",\"~8\",\"~9\",\"~A\",\"~B\",\"~C\",\"~D\",\"~E\",\"~F\",\"~G\",\"~H\",\"~I\",\"~J\",\"~1m\",\"~1n\",\"~1o\",\"~1p\",\"~1q\",\"~1r\",\"~1s\",\"~1t\",\"~1u\",\"~1v\",\"~K\",\"~L\",\"~M\",\"~N\",\"~O\",\"~P\",\"~Q\",\"~R\",\"~S\",\"~T\",\"~U\",\"~V\",\"~W\",\"~X\",\"~Y\",\"~Z\",\"~a\",\"~b\",\"~c\",\"~d\",\"~e\",\"~f\",\"~g\",\"~h\",\"~i\",\"~j\",\"~k\",\"~l\",\"~m\",\"~n\",\"~o\",\"~p\",\"~q\",\"~r\",\"~s\",\"~t\",\"~u\",\"~v\",\"~w\",\"~x\",\"~y\",\"~z\",\"~10\",\"~11\",\"~12\",\"~13\",\"~14\",\"~15\",\"~16\",\"~17\",\"~18\",\"~19\",\"~1A\",\"~1B\",\"~1C\",\"~1D\",\"~1E\",\"~1F\",\"~1G\",\"~1H\",\"~1I\",\"~1J\",\"~1K\",\"~1L\",\"~1M\",\"~1N\",\"~1O\",\"~1P\",\"~1Q\",\"~1R\",\"~1S\",\"~1T\",\"~1U\",\"~1V\",\"~1W\",\"~1X\",\"~1Y\",\"~1Z\",\"~1a\",\"~1b\",\"~1c\",\"~1d\",\"~1e\",\"~1f\",\"~1g\",\"~1h\",\"~1i\",\"~1j\",\"~1k\",\"~1l\",\"~0\",\"~1\",\"~2\",\"~3\",\"~4\",\"~5\",\"~6\",\"~7\",\"~8\",\"~9\",\"~A\",\"~B\",\"~C\",\"~D\",\"~E\",\"~F\",\"~G\",\"~H\",\"~I\",\"~J\"]}"
+    },
+    {
+      "name": "a record set worth compressing",
+      "source": "[{\"id\":0,\"reference\":\"REF-10000\",\"status\":\"open\",\"region\":\"north\",\"amount\":0,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":1,\"reference\":\"REF-10001\",\"status\":\"closed\",\"region\":\"south\",\"amount\":1.37,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":2,\"reference\":\"REF-10002\",\"status\":\"pending\",\"region\":\"east\",\"amount\":2.74,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":3,\"reference\":\"REF-10003\",\"status\":\"open\",\"region\":\"west\",\"amount\":4.11,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":4,\"reference\":\"REF-10004\",\"status\":\"closed\",\"region\":\"north\",\"amount\":5.48,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":5,\"reference\":\"REF-10005\",\"status\":\"pending\",\"region\":\"south\",\"amount\":6.85,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":6,\"reference\":\"REF-10006\",\"status\":\"open\",\"region\":\"east\",\"amount\":8.22,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":7,\"reference\":\"REF-10007\",\"status\":\"closed\",\"region\":\"west\",\"amount\":9.59,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":8,\"reference\":\"REF-10008\",\"status\":\"pending\",\"region\":\"north\",\"amount\":10.96,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":9,\"reference\":\"REF-10009\",\"status\":\"open\",\"region\":\"south\",\"amount\":12.33,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":10,\"reference\":\"REF-10010\",\"status\":\"closed\",\"region\":\"east\",\"amount\":13.7,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":11,\"reference\":\"REF-10011\",\"status\":\"pending\",\"region\":\"west\",\"amount\":15.07,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":12,\"reference\":\"REF-10012\",\"status\":\"open\",\"region\":\"north\",\"amount\":16.44,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":13,\"reference\":\"REF-10013\",\"status\":\"closed\",\"region\":\"south\",\"amount\":17.81,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":14,\"reference\":\"REF-10014\",\"status\":\"pending\",\"region\":\"east\",\"amount\":19.18,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":15,\"reference\":\"REF-10015\",\"status\":\"open\",\"region\":\"west\",\"amount\":20.55,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":16,\"reference\":\"REF-10016\",\"status\":\"closed\",\"region\":\"north\",\"amount\":21.92,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":17,\"reference\":\"REF-10017\",\"status\":\"pending\",\"region\":\"south\",\"amount\":23.29,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":18,\"reference\":\"REF-10018\",\"status\":\"open\",\"region\":\"east\",\"amount\":24.66,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":19,\"reference\":\"REF-10019\",\"status\":\"closed\",\"region\":\"west\",\"amount\":26.03,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":20,\"reference\":\"REF-10020\",\"status\":\"pending\",\"region\":\"north\",\"amount\":27.4,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":21,\"reference\":\"REF-10021\",\"status\":\"open\",\"region\":\"south\",\"amount\":28.77,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":22,\"reference\":\"REF-10022\",\"status\":\"closed\",\"region\":\"east\",\"amount\":30.14,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":23,\"reference\":\"REF-10023\",\"status\":\"pending\",\"region\":\"west\",\"amount\":31.51,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":24,\"reference\":\"REF-10024\",\"status\":\"open\",\"region\":\"north\",\"amount\":32.88,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":25,\"reference\":\"REF-10025\",\"status\":\"closed\",\"region\":\"south\",\"amount\":34.25,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":26,\"reference\":\"REF-10026\",\"status\":\"pending\",\"region\":\"east\",\"amount\":35.62,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":27,\"reference\":\"REF-10027\",\"status\":\"open\",\"region\":\"west\",\"amount\":36.99,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":28,\"reference\":\"REF-10028\",\"status\":\"closed\",\"region\":\"north\",\"amount\":38.36,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":29,\"reference\":\"REF-10029\",\"status\":\"pending\",\"region\":\"south\",\"amount\":39.73,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":30,\"reference\":\"REF-10030\",\"status\":\"open\",\"region\":\"east\",\"amount\":41.1,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":31,\"reference\":\"REF-10031\",\"status\":\"closed\",\"region\":\"west\",\"amount\":42.47,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":32,\"reference\":\"REF-10032\",\"status\":\"pending\",\"region\":\"north\",\"amount\":43.84,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":33,\"reference\":\"REF-10033\",\"status\":\"open\",\"region\":\"south\",\"amount\":45.21,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":34,\"reference\":\"REF-10034\",\"status\":\"closed\",\"region\":\"east\",\"amount\":46.58,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":35,\"reference\":\"REF-10035\",\"status\":\"pending\",\"region\":\"west\",\"amount\":47.95,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":36,\"reference\":\"REF-10036\",\"status\":\"open\",\"region\":\"north\",\"amount\":49.32,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":37,\"reference\":\"REF-10037\",\"status\":\"closed\",\"region\":\"south\",\"amount\":50.69,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":38,\"reference\":\"REF-10038\",\"status\":\"pending\",\"region\":\"east\",\"amount\":52.06,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":39,\"reference\":\"REF-10039\",\"status\":\"open\",\"region\":\"west\",\"amount\":53.43,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":40,\"reference\":\"REF-10040\",\"status\":\"closed\",\"region\":\"north\",\"amount\":54.8,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":41,\"reference\":\"REF-10041\",\"status\":\"pending\",\"region\":\"south\",\"amount\":56.17,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":42,\"reference\":\"REF-10042\",\"status\":\"open\",\"region\":\"east\",\"amount\":57.54,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":43,\"reference\":\"REF-10043\",\"status\":\"closed\",\"region\":\"west\",\"amount\":58.91,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":44,\"reference\":\"REF-10044\",\"status\":\"pending\",\"region\":\"north\",\"amount\":60.28,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":45,\"reference\":\"REF-10045\",\"status\":\"open\",\"region\":\"south\",\"amount\":61.65,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":46,\"reference\":\"REF-10046\",\"status\":\"closed\",\"region\":\"east\",\"amount\":63.02,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":47,\"reference\":\"REF-10047\",\"status\":\"pending\",\"region\":\"west\",\"amount\":64.39,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":48,\"reference\":\"REF-10048\",\"status\":\"open\",\"region\":\"north\",\"amount\":65.76,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":49,\"reference\":\"REF-10049\",\"status\":\"closed\",\"region\":\"south\",\"amount\":67.13,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":50,\"reference\":\"REF-10050\",\"status\":\"pending\",\"region\":\"east\",\"amount\":68.5,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":51,\"reference\":\"REF-10051\",\"status\":\"open\",\"region\":\"west\",\"amount\":69.87,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":52,\"reference\":\"REF-10052\",\"status\":\"closed\",\"region\":\"north\",\"amount\":71.24,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":53,\"reference\":\"REF-10053\",\"status\":\"pending\",\"region\":\"south\",\"amount\":72.61,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":54,\"reference\":\"REF-10054\",\"status\":\"open\",\"region\":\"east\",\"amount\":73.98,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":55,\"reference\":\"REF-10055\",\"status\":\"closed\",\"region\":\"west\",\"amount\":75.35,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":56,\"reference\":\"REF-10056\",\"status\":\"pending\",\"region\":\"north\",\"amount\":76.72,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":57,\"reference\":\"REF-10057\",\"status\":\"open\",\"region\":\"south\",\"amount\":78.09,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":58,\"reference\":\"REF-10058\",\"status\":\"closed\",\"region\":\"east\",\"amount\":79.46,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"},{\"id\":59,\"reference\":\"REF-10059\",\"status\":\"pending\",\"region\":\"west\",\"amount\":80.83,\"currency\":\"GBP\",\"createdAt\":\"2026-08-18T09:30:00.000Z\"}]",
+      "compressed": "{\"jc\":1,\"k\":[\"id\",\"reference\",\"status\",\"region\",\"amount\",\"currency\",\"createdAt\"],\"s\":[\"pending\",\"closed\",\"open\",\"north\",\"south\",\"east\",\"west\"],\"d\":{\"~t\":[0,1,2,3,4,5,6],\"~e\":[0,0,1,1,0,2,2],\"~cv\":[\"GBP\",\"2026-08-18T09:30:00.000Z\"],\"~r\":[[0,\"REF-10000\",2,3,0],[1,\"REF-10001\",1,4,1.37],[2,\"REF-10002\",0,5,2.74],[3,\"REF-10003\",2,6,4.11],[4,\"REF-10004\",1,3,5.48],[5,\"REF-10005\",0,4,6.85],[6,\"REF-10006\",2,5,8.22],[7,\"REF-10007\",1,6,9.59],[8,\"REF-10008\",0,3,10.96],[9,\"REF-10009\",2,4,12.33],[10,\"REF-10010\",1,5,13.7],[11,\"REF-10011\",0,6,15.07],[12,\"REF-10012\",2,3,16.44],[13,\"REF-10013\",1,4,17.81],[14,\"REF-10014\",0,5,19.18],[15,\"REF-10015\",2,6,20.55],[16,\"REF-10016\",1,3,21.92],[17,\"REF-10017\",0,4,23.29],[18,\"REF-10018\",2,5,24.66],[19,\"REF-10019\",1,6,26.03],[20,\"REF-10020\",0,3,27.4],[21,\"REF-10021\",2,4,28.77],[22,\"REF-10022\",1,5,30.14],[23,\"REF-10023\",0,6,31.51],[24,\"REF-10024\",2,3,32.88],[25,\"REF-10025\",1,4,34.25],[26,\"REF-10026\",0,5,35.62],[27,\"REF-10027\",2,6,36.99],[28,\"REF-10028\",1,3,38.36],[29,\"REF-10029\",0,4,39.73],[30,\"REF-10030\",2,5,41.1],[31,\"REF-10031\",1,6,42.47],[32,\"REF-10032\",0,3,43.84],[33,\"REF-10033\",2,4,45.21],[34,\"REF-10034\",1,5,46.58],[35,\"REF-10035\",0,6,47.95],[36,\"REF-10036\",2,3,49.32],[37,\"REF-10037\",1,4,50.69],[38,\"REF-10038\",0,5,52.06],[39,\"REF-10039\",2,6,53.43],[40,\"REF-10040\",1,3,54.8],[41,\"REF-10041\",0,4,56.17],[42,\"REF-10042\",2,5,57.54],[43,\"REF-10043\",1,6,58.91],[44,\"REF-10044\",0,3,60.28],[45,\"REF-10045\",2,4,61.65],[46,\"REF-10046\",1,5,63.02],[47,\"REF-10047\",0,6,64.39],[48,\"REF-10048\",2,3,65.76],[49,\"REF-10049\",1,4,67.13],[50,\"REF-10050\",0,5,68.5],[51,\"REF-10051\",2,6,69.87],[52,\"REF-10052\",1,3,71.24],[53,\"REF-10053\",0,4,72.61],[54,\"REF-10054\",2,5,73.98],[55,\"REF-10055\",1,6,75.35],[56,\"REF-10056\",0,3,76.72],[57,\"REF-10057\",2,4,78.09],[58,\"REF-10058\",1,5,79.46],[59,\"REF-10059\",0,6,80.83]]}}"
+    },
+    {
+      "name": "scalars",
+      "source": "[null,true,false,0,-1,1.5,1e+21,-1e-7,\"\",\"plain\"]",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":[null,true,false,0,-1,1.5,1e+21,-1e-7,\"\",\"plain\"]}"
+    },
+    {
+      "name": "seed 1",
+      "seed": 1,
+      "source": "8",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":8}"
+    },
+    {
+      "name": "seed 2",
+      "seed": 2,
+      "source": "-623",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":-623}"
+    },
+    {
+      "name": "seed 3",
+      "seed": 3,
+      "source": "373658.5769802332",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":373658.5769802332}"
+    },
+    {
+      "name": "seed 4",
+      "seed": 4,
+      "source": "\"~zz\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"~~zz\"}"
+    },
+    {
+      "name": "seed 5",
+      "seed": 5,
+      "source": "\"pending\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"pending\"}"
+    },
+    {
+      "name": "seed 6",
+      "seed": 6,
+      "source": "\"true\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"true\"}"
+    },
+    {
+      "name": "seed 7",
+      "seed": 7,
+      "source": "\"a longer value that repeats across many records\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"a longer value that repeats across many records\"}"
+    },
+    {
+      "name": "seed 8",
+      "seed": 8,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 9",
+      "seed": 9,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 10",
+      "seed": 10,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 11",
+      "seed": 11,
+      "source": "true",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":true}"
+    },
+    {
+      "name": "seed 12",
+      "seed": 12,
+      "source": "-928",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":-928}"
+    },
+    {
+      "name": "seed 13",
+      "seed": 13,
+      "source": "441",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":441}"
+    },
+    {
+      "name": "seed 14",
+      "seed": 14,
+      "source": "-190",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":-190}"
+    },
+    {
+      "name": "seed 15",
+      "seed": 15,
+      "source": "\"a\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"a\"}"
+    },
+    {
+      "name": "seed 16",
+      "seed": 16,
+      "source": "\"مرحبا\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"مرحبا\"}"
+    },
+    {
+      "name": "seed 17",
+      "seed": 17,
+      "source": "\"~0\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"~~0\"}"
+    },
+    {
+      "name": "seed 18",
+      "seed": 18,
+      "source": "\"active\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"active\"}"
+    },
+    {
+      "name": "seed 19",
+      "seed": 19,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 20",
+      "seed": 20,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 21",
+      "seed": 21,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 22",
+      "seed": 22,
+      "source": "false",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":false}"
+    },
+    {
+      "name": "seed 23",
+      "seed": 23,
+      "source": "135",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":135}"
+    },
+    {
+      "name": "seed 24",
+      "seed": 24,
+      "source": "-495",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":-495}"
+    },
+    {
+      "name": "seed 25",
+      "seed": 25,
+      "source": "874",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":874}"
+    },
+    {
+      "name": "seed 26",
+      "seed": 26,
+      "source": "\"a longer value that repeats across many records\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"a longer value that repeats across many records\"}"
+    },
+    {
+      "name": "seed 27",
+      "seed": 27,
+      "source": "\"cancelled\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"cancelled\"}"
+    },
+    {
+      "name": "seed 28",
+      "seed": 28,
+      "source": "\"0\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"0\"}"
+    },
+    {
+      "name": "seed 29",
+      "seed": 29,
+      "source": "\"quote \\\" backslash \\\\ newline \\n tab \\t\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"quote \\\" backslash \\\\ newline \\n tab \\t\"}"
+    },
+    {
+      "name": "seed 30",
+      "seed": 30,
+      "source": "\"~\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"~~\"}"
+    },
+    {
+      "name": "seed 31",
+      "seed": 31,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 32",
+      "seed": 32,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 33",
+      "seed": 33,
+      "source": "true",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":true}"
+    },
+    {
+      "name": "seed 34",
+      "seed": 34,
+      "source": "-801",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":-801}"
+    },
+    {
+      "name": "seed 35",
+      "seed": 35,
+      "source": "568",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":568}"
+    },
+    {
+      "name": "seed 36",
+      "seed": 36,
+      "source": "-62",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":-62}"
+    },
+    {
+      "name": "seed 37",
+      "seed": 37,
+      "source": "\"active\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"active\"}"
+    },
+    {
+      "name": "seed 38",
+      "seed": 38,
+      "source": "\"null\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"null\"}"
+    },
+    {
+      "name": "seed 39",
+      "seed": 39,
+      "source": "\"~zz\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"~~zz\"}"
+    },
+    {
+      "name": "seed 40",
+      "seed": 40,
+      "source": "\"pending\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"pending\"}"
+    },
+    {
+      "name": "seed 41",
+      "seed": 41,
+      "source": "\"true\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"true\"}"
+    },
+    {
+      "name": "seed 42",
+      "seed": 42,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 43",
+      "seed": 43,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 44",
+      "seed": 44,
+      "source": "false",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":false}"
+    },
+    {
+      "name": "seed 45",
+      "seed": 45,
+      "source": "262",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":262}"
+    },
+    {
+      "name": "seed 46",
+      "seed": 46,
+      "source": "-368",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":-368}"
+    },
+    {
+      "name": "seed 47",
+      "seed": 47,
+      "source": "-999",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":-999}"
+    },
+    {
+      "name": "seed 48",
+      "seed": 48,
+      "source": "\"quote \\\" backslash \\\\ newline \\n tab \\t\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"quote \\\" backslash \\\\ newline \\n tab \\t\"}"
+    },
+    {
+      "name": "seed 49",
+      "seed": 49,
+      "source": "\"~\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"~~\"}"
+    },
+    {
+      "name": "seed 50",
+      "seed": 50,
+      "source": "\"\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"\"}"
+    },
+    {
+      "name": "seed 51",
+      "seed": 51,
+      "source": "\"😀 emoji\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"😀 emoji\"}"
+    },
+    {
+      "name": "seed 52",
+      "seed": 52,
+      "source": "\"~~\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"~~~\"}"
+    },
+    {
+      "name": "seed 53",
+      "seed": 53,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 54",
+      "seed": 54,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 55",
+      "seed": 55,
+      "source": "true",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":true}"
+    },
+    {
+      "name": "seed 56",
+      "seed": 56,
+      "source": "-674",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":-674}"
+    },
+    {
+      "name": "seed 57",
+      "seed": 57,
+      "source": "695",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":695}"
+    },
+    {
+      "name": "seed 58",
+      "seed": 58,
+      "source": "65",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":65}"
+    },
+    {
+      "name": "seed 59",
+      "seed": 59,
+      "source": "\"pending\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"pending\"}"
+    },
+    {
+      "name": "seed 60",
+      "seed": 60,
+      "source": "\"true\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"true\"}"
+    },
+    {
+      "name": "seed 61",
+      "seed": 61,
+      "source": "\"a longer value that repeats across many records\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"a longer value that repeats across many records\"}"
+    },
+    {
+      "name": "seed 62",
+      "seed": 62,
+      "source": "\"cancelled\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"cancelled\"}"
+    },
+    {
+      "name": "seed 63",
+      "seed": 63,
+      "source": "\"0\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"0\"}"
+    },
+    {
+      "name": "seed 64",
+      "seed": 64,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 65",
+      "seed": 65,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 66",
+      "seed": 66,
+      "source": "true",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":true}"
+    },
+    {
+      "name": "seed 67",
+      "seed": 67,
+      "source": "389",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":389}"
+    },
+    {
+      "name": "seed 68",
+      "seed": 68,
+      "source": "-241",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":-241}"
+    },
+    {
+      "name": "seed 69",
+      "seed": 69,
+      "source": "-872",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":-872}"
+    },
+    {
+      "name": "seed 70",
+      "seed": 70,
+      "source": "\"😀 emoji\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"😀 emoji\"}"
+    },
+    {
+      "name": "seed 71",
+      "seed": 71,
+      "source": "\"~~\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"~~~\"}"
+    },
+    {
+      "name": "seed 72",
+      "seed": 72,
+      "source": "\"a\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"a\"}"
+    },
+    {
+      "name": "seed 73",
+      "seed": 73,
+      "source": "\"مرحبا\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"مرحبا\"}"
+    },
+    {
+      "name": "seed 74",
+      "seed": 74,
+      "source": "\"~0\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"~~0\"}"
+    },
+    {
+      "name": "seed 75",
+      "seed": 75,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 76",
+      "seed": 76,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 77",
+      "seed": 77,
+      "source": "false",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":false}"
+    },
+    {
+      "name": "seed 78",
+      "seed": 78,
+      "source": "-547",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":-547}"
+    },
+    {
+      "name": "seed 79",
+      "seed": 79,
+      "source": "822",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":822}"
+    },
+    {
+      "name": "seed 80",
+      "seed": 80,
+      "source": "192",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":192}"
+    },
+    {
+      "name": "seed 81",
+      "seed": 81,
+      "source": "\"cancelled\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"cancelled\"}"
+    },
+    {
+      "name": "seed 82",
+      "seed": 82,
+      "source": "\"0\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"0\"}"
+    },
+    {
+      "name": "seed 83",
+      "seed": 83,
+      "source": "\"quote \\\" backslash \\\\ newline \\n tab \\t\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"quote \\\" backslash \\\\ newline \\n tab \\t\"}"
+    },
+    {
+      "name": "seed 84",
+      "seed": 84,
+      "source": "\"~\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"~~\"}"
+    },
+    {
+      "name": "seed 85",
+      "seed": 85,
+      "source": "\"\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"\"}"
+    },
+    {
+      "name": "seed 86",
+      "seed": 86,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 87",
+      "seed": 87,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 88",
+      "seed": 88,
+      "source": "true",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":true}"
+    },
+    {
+      "name": "seed 89",
+      "seed": 89,
+      "source": "517",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":517}"
+    },
+    {
+      "name": "seed 90",
+      "seed": 90,
+      "source": "-114",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":-114}"
+    },
+    {
+      "name": "seed 91",
+      "seed": 91,
+      "source": "-745",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":-745}"
+    },
+    {
+      "name": "seed 92",
+      "seed": 92,
+      "source": "\"null\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"null\"}"
+    },
+    {
+      "name": "seed 93",
+      "seed": 93,
+      "source": "\"~0\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"~~0\"}"
+    },
+    {
+      "name": "seed 94",
+      "seed": 94,
+      "source": "\"active\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"active\"}"
+    },
+    {
+      "name": "seed 95",
+      "seed": 95,
+      "source": "\"null\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"null\"}"
+    },
+    {
+      "name": "seed 96",
+      "seed": 96,
+      "source": "\"~zz\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"~~zz\"}"
+    },
+    {
+      "name": "seed 97",
+      "seed": 97,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 98",
+      "seed": 98,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 99",
+      "seed": 99,
+      "source": "false",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":false}"
+    },
+    {
+      "name": "seed 100",
+      "seed": 100,
+      "source": "-420",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":-420}"
+    },
+    {
+      "name": "seed 101",
+      "seed": 101,
+      "source": "950",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":950}"
+    },
+    {
+      "name": "seed 102",
+      "seed": 102,
+      "source": "319",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":319}"
+    },
+    {
+      "name": "seed 103",
+      "seed": 103,
+      "source": "\"~\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"~~\"}"
+    },
+    {
+      "name": "seed 104",
+      "seed": 104,
+      "source": "\"\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"\"}"
+    },
+    {
+      "name": "seed 105",
+      "seed": 105,
+      "source": "\"😀 emoji\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"😀 emoji\"}"
+    },
+    {
+      "name": "seed 106",
+      "seed": 106,
+      "source": "\"~~\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"~~~\"}"
+    },
+    {
+      "name": "seed 107",
+      "seed": 107,
+      "source": "\"a\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"a\"}"
+    },
+    {
+      "name": "seed 108",
+      "seed": 108,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 109",
+      "seed": 109,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 110",
+      "seed": 110,
+      "source": "true",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":true}"
+    },
+    {
+      "name": "seed 111",
+      "seed": 111,
+      "source": "644",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":644}"
+    },
+    {
+      "name": "seed 112",
+      "seed": 112,
+      "source": "13",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":13}"
+    },
+    {
+      "name": "seed 113",
+      "seed": 113,
+      "source": "-617",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":-617}"
+    },
+    {
+      "name": "seed 114",
+      "seed": 114,
+      "source": "376276.80669538677",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":376276.80669538677}"
+    },
+    {
+      "name": "seed 115",
+      "seed": 115,
+      "source": "\"~zz\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"~~zz\"}"
+    },
+    {
+      "name": "seed 116",
+      "seed": 116,
+      "source": "\"pending\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"pending\"}"
+    },
+    {
+      "name": "seed 117",
+      "seed": 117,
+      "source": "\"true\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"true\"}"
+    },
+    {
+      "name": "seed 118",
+      "seed": 118,
+      "source": "\"a longer value that repeats across many records\"",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":\"a longer value that repeats across many records\"}"
+    },
+    {
+      "name": "seed 119",
+      "seed": 119,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    },
+    {
+      "name": "seed 120",
+      "seed": 120,
+      "source": "null",
+      "compressed": "{\"jc\":1,\"k\":[],\"d\":null}"
+    }
+  ]
+}

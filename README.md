@@ -29,15 +29,22 @@ JSON, so it travels anywhere JSON travels.
 | Language | Package | Status |
 |---|---|---|
 | **JavaScript / TypeScript** | [`@tech-style/json-compress`](https://www.npmjs.com/package/@tech-style/json-compress) on npm | Released — [`javascript/`](javascript/) |
+| **.NET** | [`TechStyle.JsonCompress`](https://www.nuget.org/packages/TechStyle.JsonCompress) on NuGet | Released — [`dotnet/`](dotnet/) |
 | PHP | Packagist | Planned |
 | Java | Maven Central | Planned |
-| .NET | NuGet | Planned |
 | Python | PyPI | Planned |
 
 Every implementation targets the same wire format, defined in
 [**SPEC.md**](SPEC.md). That document is complete enough to write a port from
 without reading any of the existing code, and it carries the conformance rules a
 port has to meet.
+
+The two released implementations do more than target the same format: they write
+the same bytes. A corpus of 143 documents — the awkward cases from the
+specification, plus 120 generated from a seeded source both suites reproduce —
+is compressed by each and restored by the other on every CI run. That is
+stronger than the specification requires, and it is the sharpest evidence
+available that the two are making the same decisions for the same reasons.
 
 ---
 
@@ -124,6 +131,29 @@ About 7 KB over the wire. Nothing in the library touches the network — see
 [`javascript/browser.md`](javascript/browser.md) for version pinning,
 subresource integrity and a complete copy-and-paste page.
 
+### In .NET
+
+```bash
+dotnet add package TechStyle.JsonCompress
+```
+
+```csharp
+using System.Text.Json.Nodes;
+using TechStyle.JsonCompress;
+
+var small = JsonCompressor.Compress(records);
+var back  = JsonCompressor.Decompress(small);
+var report = JsonCompressor.Measure(records);
+```
+
+No dependencies on .NET 8 and later; `netstandard2.0` is there for .NET
+Framework. There is a command line too:
+
+```bash
+dotnet tool install --global TechStyle.JsonCompress.Cli
+json-compress stats orders.json
+```
+
 ### Or online, with nothing at all
 
 **[tech-style.co/json-minifier.html](https://tech-style.co/json-minifier.html)**
@@ -138,6 +168,7 @@ Nothing is uploaded.
 ```
 SPEC.md         The wire format. The contract every implementation meets.
 javascript/     The JavaScript and TypeScript implementation, published to npm.
+dotnet/         The .NET implementation, published to NuGet.
 LICENSE         MIT, for everything here.
 ```
 
@@ -152,7 +183,12 @@ its own README, its own release process.
 2. Reproduce the cases in `javascript/tests/` — especially the tilde escape,
    holes against nulls, `__proto__` as a key name, token-shaped key names, and
    rows whose key orders disagree. Those are where ports go wrong.
-3. Check your output against the JavaScript implementation in both directions.
+3. Check your output against
+   [`dotnet/tests/TechStyle.JsonCompress.Tests/fixtures/conformance.json`](dotnet/tests/TechStyle.JsonCompress.Tests/fixtures/conformance.json).
+   It is 143 source documents paired with the envelope the reference encoder
+   wrote for each, as text, in a form any language can read. Restoring all of
+   them is the bar; writing the same envelopes means your encoder is making the
+   same choices as well.
 4. Open a pull request with the implementation in its own top-level directory.
 
 Issues and pull requests are welcome.

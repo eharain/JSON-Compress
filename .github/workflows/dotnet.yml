@@ -1,0 +1,79 @@
+name: dotnet
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'dotnet/**'
+      - '.github/workflows/dotnet.yml'
+  pull_request:
+    paths:
+      - 'dotnet/**'
+      - '.github/workflows/dotnet.yml'
+
+defaults:
+  run:
+    working-directory: dotnet
+
+jobs:
+  test:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - name: Restore
+        run: dotnet restore JsonCompress.sln
+
+      - name: Build
+        run: dotnet build JsonCompress.sln -c Release --no-restore
+
+      - name: Test
+        run: dotnet test JsonCompress.sln -c Release --no-build --verbosity normal
+
+      - name: Benchmark
+        run: dotnet run --project examples/Benchmark -c Release --no-build
+
+      - name: Check the package contents
+        run: dotnet pack src/TechStyle.JsonCompress -c Release --no-build
+
+  interop:
+    name: agrees with the javascript implementation
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build the command line
+        run: dotnet build cli/TechStyle.JsonCompress.Cli -c Release -f net10.0
+
+      # Every case in the corpus, compressed by one implementation and restored
+      # by the other, both ways round.
+      - name: Round-trip the corpus through both implementations
+        run: node tests/interop/verify-interop.mjs
+
+      # The corpus is checked in, so a change to either encoder that would make
+      # them disagree has to show up as a diff here rather than going unnoticed.
+      - name: Check the corpus is up to date
+        run: |
+          node tests/interop/generate-fixtures.mjs
+          git diff --exit-code -- tests/TechStyle.JsonCompress.Tests/fixtures

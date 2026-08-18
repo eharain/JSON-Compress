@@ -9,6 +9,13 @@ node_modules/
 # javascript/dist is deliberately committed: jsDelivr serves the browser bundle
 # straight out of the repository, so the built files have to be in it.
 
+# .NET build output. Scoped to dotnet/, because javascript/bin holds the CLI
+# entry point and is meant to be committed.
+dotnet/**/bin/
+dotnet/**/obj/
+dotnet/**/TestResults/
+*.user
+
 # Editor and OS noise
 .DS_Store
 Thumbs.db
