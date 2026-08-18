@@ -1,2 +1,18 @@
+# Working notes and the internal code this library was repurposed from.
 concept.txt
 results-helper.ts
+
+# Dependencies and build output
+node_modules/
+*/node_modules/
+javascript/dist/
+
+# Editor and OS noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+npm-debug.log*
+*.log

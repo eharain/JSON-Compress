@@ -1,0 +1,103 @@
+{
+  "name": "json-compress",
+  "version": "1.0.0",
+  "description": "Lossless, dependency-free JSON compression for JavaScript. Hoists repeated object keys into a catalogue, packs arrays of objects into columnar tables, and de-duplicates repeated string values - typically 40-80% smaller JSON, still valid JSON, and a byte-perfect round trip.",
+  "license": "MIT",
+  "type": "module",
+  "author": {
+    "name": "Ejaz Hussain Arain",
+    "email": "hello@tech-style.co",
+    "url": "https://tech-style.co/"
+  },
+  "contributors": [
+    {
+      "name": "Tech Style Ltd",
+      "email": "hello@tech-style.co",
+      "url": "https://tech-style.co/"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eharain/JSON-Compress.git",
+    "directory": "javascript"
+  },
+  "bugs": {
+    "url": "https://github.com/eharain/JSON-Compress/issues",
+    "email": "hello@tech-style.co"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "homepage": "https://tech-style.co/product-json-compress.html",
+  "funding": "https://tech-style.co/",
+  "keywords": [
+    "json",
+    "compress",
+    "compression",
+    "decompress",
+    "minify",
+    "minifier",
+    "json-minifier",
+    "shrink",
+    "pack",
+    "unpack",
+    "columnar",
+    "dictionary",
+    "key-catalogue",
+    "deduplicate",
+    "payload",
+    "bandwidth",
+    "api-response",
+    "serialization",
+    "lossless",
+    "browser",
+    "nodejs",
+    "zero-dependencies",
+    "typescript",
+    "localstorage",
+    "websocket",
+    "gzip"
+  ],
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "browser": "./dist/json-compress.min.js",
+  "unpkg": "./dist/json-compress.min.js",
+  "jsdelivr": "./dist/json-compress.min.js",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "browser": "./dist/json-compress.min.js",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.mjs"
+    },
+    "./browser": "./dist/json-compress.min.js",
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "json-compress": "./bin/cli.js"
+  },
+  "files": [
+    "dist/",
+    "bin/",
+    "src/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "node scripts/build.js",
+    "test": "node --test \"tests/**/*.test.js\"",
+    "bench": "node examples/benchmark.js",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
