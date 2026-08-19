@@ -36,8 +36,8 @@ JsonCompressor.Decompress(small);   // exactly the array you started with
 
 This is the .NET implementation of the
 [json-compress format](../SPEC.md). A document written here reads correctly in
-the [JavaScript implementation](../javascript/), and the other way round — which
-is not a claim, but a
+the [JavaScript](../javascript/) and [Python](../python/) implementations, and
+the other way round — which is not a claim, but a
 [test](tests/TechStyle.JsonCompress.Tests/ConformanceTests.cs) run against a
 corpus the JavaScript encoder produced.
 
@@ -342,7 +342,7 @@ tag. Escape it at the point of embedding, as you would any other JSON.
 ## Building and testing
 
 ```bash
-dotnet test                                       # 490 tests, including the JavaScript corpus
+dotnet test                                       # 492 tests, including the JavaScript corpus
 dotnet run --project examples/Benchmark -c Release
 dotnet pack src/TechStyle.JsonCompress -c Release
 ```

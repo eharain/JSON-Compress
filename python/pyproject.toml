@@ -1,0 +1,91 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "json-compress"
+version = "1.0.0"
+description = "Lossless, dependency-free JSON compression for Python. Hoists repeated object keys into a catalogue, packs lists of dicts into columnar tables, and de-duplicates repeated string values - typically 40-80% smaller JSON, still valid JSON, and an exact round trip."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.9"
+authors = [{ name = "Ejaz Hussain Arain", email = "hello@tech-style.co" }]
+maintainers = [{ name = "Tech Style Ltd", email = "hello@tech-style.co" }]
+keywords = [
+    "json",
+    "compress",
+    "compression",
+    "decompress",
+    "minify",
+    "shrink",
+    "pack",
+    "unpack",
+    "columnar",
+    "dictionary",
+    "key-catalogue",
+    "deduplicate",
+    "payload",
+    "bandwidth",
+    "api-response",
+    "serialization",
+    "lossless",
+    "zero-dependencies",
+    "gzip",
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Topic :: Internet :: WWW/HTTP",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: System :: Archiving :: Compression",
+    "Typing :: Typed",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://tech-style.co/product-json-compress.html"
+Documentation = "https://github.com/eharain/JSON-Compress/tree/main/python#readme"
+Repository = "https://github.com/eharain/JSON-Compress"
+Issues = "https://github.com/eharain/JSON-Compress/issues"
+Changelog = "https://github.com/eharain/JSON-Compress/blob/main/python/CHANGELOG.md"
+Specification = "https://github.com/eharain/JSON-Compress/blob/main/SPEC.md"
+
+[project.scripts]
+json-compress = "json_compress.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/json_compress"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/src",
+    "/tests",
+    "/examples",
+    "/README.md",
+    "/CHANGELOG.md",
+    "/LICENSE",
+]
+
+[tool.ruff]
+line-length = 90
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "C4", "SIM"]
+ignore = ["UP006", "UP007", "UP035", "UP045", "UP031"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["json_compress", "generator"]

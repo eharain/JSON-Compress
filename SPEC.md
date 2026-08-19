@@ -439,9 +439,9 @@ catalogues large enough to need multi-character tokens, and rows whose key
 orders disagree.
 
 A machine-readable form of the same corpus is checked in at
-`dotnet/tests/TechStyle.JsonCompress.Tests/fixtures/conformance.json`: 143 cases,
+`dotnet/tests/TechStyle.JsonCompress.Tests/fixtures/conformance.json`: 144 cases,
 each a source document and the envelope the reference encoder wrote for it, both
 as JSON text. Restoring every one of them is what conformance means. Writing the
 same envelopes is not required — clause 3 above asks only that the value agree —
 but an encoder that does has demonstrated it makes the same choices as the
-reference, and both released implementations do.
+reference, and every released implementation does.

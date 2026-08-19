@@ -30,21 +30,21 @@ JSON, so it travels anywhere JSON travels.
 |---|---|---|
 | **JavaScript / TypeScript** | [`@tech-style/json-compress`](https://www.npmjs.com/package/@tech-style/json-compress) on npm | Released — [`javascript/`](javascript/) |
 | **.NET** | [`TechStyle.JsonCompress`](https://www.nuget.org/packages/TechStyle.JsonCompress) on NuGet | Released — [`dotnet/`](dotnet/) |
+| **Python** | [`json-compress`](https://pypi.org/project/json-compress/) on PyPI | Released — [`python/`](python/) |
 | PHP | Packagist | Planned |
 | Java | Maven Central | Planned |
-| Python | PyPI | Planned |
 
 Every implementation targets the same wire format, defined in
 [**SPEC.md**](SPEC.md). That document is complete enough to write a port from
 without reading any of the existing code, and it carries the conformance rules a
 port has to meet.
 
-The two released implementations do more than target the same format: they write
-the same bytes. A corpus of 143 documents — the awkward cases from the
-specification, plus 120 generated from a seeded source both suites reproduce —
-is compressed by each and restored by the other on every CI run. That is
+The released implementations do more than target the same format: they write the
+same bytes. A corpus of 144 documents — the awkward cases from the
+specification, plus 120 generated from a seeded source every suite reproduces —
+is compressed by each and restored by the others on every CI run. That is
 stronger than the specification requires, and it is the sharpest evidence
-available that the two are making the same decisions for the same reasons.
+available that they are making the same decisions for the same reasons.
 
 ---
 
@@ -154,6 +154,27 @@ dotnet tool install --global TechStyle.JsonCompress.Cli
 json-compress stats orders.json
 ```
 
+### In Python
+
+```bash
+pip install json-compress
+```
+
+```python
+from json_compress import compress, decompress, measure
+
+small  = compress(records)
+back   = decompress(small)
+report = measure(records)
+```
+
+Python 3.9 and later, no dependencies — everything it needs is in the standard
+library. The same command line comes with the package:
+
+```bash
+json-compress stats orders.json
+```
+
 ### Or online, with nothing at all
 
 **[tech-style.co/json-minifier.html](https://tech-style.co/json-minifier.html)**
@@ -169,6 +190,7 @@ Nothing is uploaded.
 SPEC.md         The wire format. The contract every implementation meets.
 javascript/     The JavaScript and TypeScript implementation, published to npm.
 dotnet/         The .NET implementation, published to NuGet.
+python/         The Python implementation, published to PyPI.
 LICENSE         MIT, for everything here.
 ```
 
@@ -185,7 +207,7 @@ its own README, its own release process.
    rows whose key orders disagree. Those are where ports go wrong.
 3. Check your output against
    [`dotnet/tests/TechStyle.JsonCompress.Tests/fixtures/conformance.json`](dotnet/tests/TechStyle.JsonCompress.Tests/fixtures/conformance.json).
-   It is 143 source documents paired with the envelope the reference encoder
+   It is 144 source documents paired with the envelope the reference encoder
    wrote for each, as text, in a form any language can read. Restoring all of
    them is the bar; writing the same envelopes means your encoder is making the
    same choices as well.

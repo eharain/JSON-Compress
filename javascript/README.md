@@ -322,11 +322,13 @@ an implementation from, in any language, without reading this one. In outline:
 Keys become short letter-first tokens; a tilde marks a catalogue reference or an
 escaped literal; a `~t` member marks a columnar table. That is the whole of it.
 
-There is a [.NET implementation](https://github.com/eharain/JSON-Compress/tree/main/dotnet)
-of the same format, on NuGet as `TechStyle.JsonCompress`. The two do not merely
-interoperate — they write the same bytes, checked on every CI run against a
-corpus of 143 documents that each compresses and the other restores. PHP, Java
-and Python are planned against the same specification.
+There are [.NET](https://github.com/eharain/JSON-Compress/tree/main/dotnet) and
+[Python](https://github.com/eharain/JSON-Compress/tree/main/python)
+implementations of the same format, on NuGet as `TechStyle.JsonCompress` and on
+PyPI as `json-compress`. The three do not merely interoperate — they write the
+same bytes, checked on every CI run against a corpus of 144 documents that each
+compresses and the others restore. PHP and Java are planned against the same
+specification.
 
 ---
 

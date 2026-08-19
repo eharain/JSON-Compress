@@ -16,6 +16,16 @@ dotnet/**/obj/
 dotnet/**/TestResults/
 *.user
 
+# Python build output and caches.
+__pycache__/
+*.py[cod]
+python/build/
+python/dist/
+python/.venv/
+python/*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
 # Editor and OS noise
 .DS_Store
 Thumbs.db

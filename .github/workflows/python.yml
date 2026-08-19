@@ -1,0 +1,75 @@
+name: python
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'python/**'
+      - '.github/workflows/python.yml'
+  pull_request:
+    paths:
+      - 'python/**'
+      - '.github/workflows/python.yml'
+
+defaults:
+  run:
+    working-directory: python
+
+jobs:
+  test:
+    name: python ${{ matrix.python }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python: ['3.9', '3.10', '3.11', '3.12', '3.13']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Test
+        run: python -m unittest discover tests
+        env:
+          PYTHONPATH: src
+
+      - name: Benchmark
+        run: python examples/benchmark.py
+        env:
+          PYTHONPATH: src
+
+      - name: Build
+        run: |
+          python -m pip install --upgrade build
+          python -m build
+
+      - name: Check the package installs and the command line runs
+        run: |
+          python -m pip install --find-links dist --no-index json-compress
+          json-compress --version
+          echo "[{\"a\":1},{\"a\":2}]" | json-compress compress
+
+  interop:
+    name: agrees with the javascript implementation
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Every case in the corpus, compressed by one implementation and restored
+      # by the other, both ways round - and the envelopes compared byte for
+      # byte, which is stronger than the format requires.
+      - name: Round-trip the corpus through both implementations
+        run: node tests/interop/verify-interop.mjs python
