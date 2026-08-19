@@ -124,6 +124,12 @@ const named = [
     { k: 'x', n: 1 }, { k: null, n: 2 }, { n: 3 },
     { k: 'x', n: 4 }, { k: 'y', n: 5 }, { k: 'x', n: 6 },
   ]],
+  // -1 is what a dictionary column writes for an absent key, so a raw column
+  // holding that number is the one place a trailing cell can be mistaken for a
+  // hole and trimmed away.
+  ['minus one in a raw column', [
+    { a: 1, b: -1 }, { a: 2, b: 5 }, { a: 3, b: -1 }, { a: 4 }, { a: 5, b: -1 },
+  ]],
   ['every column constant', [
     { a: 1, b: 'x' }, { a: 1, b: 'x' }, { a: 1, b: 'x' }, { a: 1, b: 'x' },
   ]],

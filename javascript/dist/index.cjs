@@ -564,6 +564,7 @@ function encodeTable(rows, plan, ctx) {
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
     const cells = new Array(variableCount);
+    const holes = new Array(variableCount);
     let at = 0;
     for (let c = 0; c < columns.length; c++) {
       const encoding = encodings[c];
@@ -581,14 +582,11 @@ function encodeTable(rows, plan, ctx) {
       } else {
         cells[at] = missing ? HOLE : encodeValue(row[key], ctx);
       }
+      holes[at] = missing;
       at++;
     }
     let end = cells.length;
-    while (end > 0) {
-      const cell = cells[end - 1];
-      if (cell === HOLE || cell === DICT_HOLE) end--;
-      else break;
-    }
+    while (end > 0 && holes[end - 1]) end--;
     matrix[i] = end === cells.length ? cells : cells.slice(0, end);
   }
   node[T_ROWS] = matrix;

@@ -4,6 +4,19 @@ All notable changes to `@tech-style/json-compress` are recorded here. The format
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- A raw column holding the number `-1` lost its key. Trailing row cells were
+  trimmed by comparing the cell against both hole markers, and `-1` is the
+  marker a *dictionary* column uses for an absent key — so a raw column that
+  happened to contain that number was trimmed away and the key was missing after
+  decoding. The encoder now records whether each cell is a hole rather than
+  inferring it from the value. The .NET implementation was never affected; a
+  case covering it has been added to the conformance corpus, which now has 144
+  documents.
+
 ## [1.0.2] - 2026-08-18
 
 ### Fixed

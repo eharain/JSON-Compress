@@ -93,6 +93,23 @@ test('a missing key is not the same as a null one in a dictionary column', () =>
   assert.deepEqual(restored, value);
 });
 
+test('a raw column may hold the number a dictionary column uses for a hole', () => {
+  // -1 is what a dictionary column writes for an absent key. A raw column that
+  // happens to hold that number must not be trimmed away as though the key were
+  // missing - the two look alike on the wire and are not the same thing.
+  roundTrips([{ a: 1, b: -1 }, { a: 2, b: 5 }], 'minus one in a trailing raw cell');
+  roundTrips([{ a: 1, b: -1 }, { a: 2, b: -1 }, { a: 3, b: 7 }], 'minus one on several rows');
+  roundTrips([{ a: -1 }, { a: -1 }, { a: 2 }], 'minus one in the only column');
+  roundTrips([{ a: 1 }, { a: 2, b: -1 }], 'a real hole beside a real minus one');
+
+  const value = [{ a: 1, b: -1 }, { a: 2, b: 5 }];
+  assert.equal(
+    JSON.stringify(compress(value)),
+    '{"jc":1,"k":["a","b"],"d":{"~t":[0,1],"~r":[[1,-1],[2,5]]}}',
+    'the cell is written, not trimmed'
+  );
+});
+
 test('constant columns are restored on every row', () => {
   const value = [
     { type: 'order', id: 1 },

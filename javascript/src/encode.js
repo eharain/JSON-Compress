@@ -252,6 +252,10 @@ function encodeTable(rows, plan, ctx) {
   for (let i = 0; i < rows.length; i++) {
     const row = rows[i];
     const cells = new Array(variableCount);
+    // Whether a cell is a hole is recorded rather than inferred from what it
+    // holds: a raw column may legitimately contain the number -1, which is
+    // exactly what a dictionary column writes for an absent key.
+    const holes = new Array(variableCount);
     let at = 0;
     for (let c = 0; c < columns.length; c++) {
       const encoding = encodings[c];
@@ -269,17 +273,14 @@ function encodeTable(rows, plan, ctx) {
       } else {
         cells[at] = missing ? HOLE : encodeValue(row[key], ctx);
       }
+      holes[at] = missing;
       at++;
     }
 
     // Trailing gaps need not be written down; a short row is understood to be
     // missing everything past its end.
     let end = cells.length;
-    while (end > 0) {
-      const cell = cells[end - 1];
-      if (cell === HOLE || cell === DICT_HOLE) end--;
-      else break;
-    }
+    while (end > 0 && holes[end - 1]) end--;
     matrix[i] = end === cells.length ? cells : cells.slice(0, end);
   }
 
