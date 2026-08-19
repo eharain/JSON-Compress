@@ -1,0 +1,112 @@
+name: php
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'php/**'
+      - '.github/workflows/php.yml'
+  pull_request:
+    paths:
+      - 'php/**'
+      - '.github/workflows/php.yml'
+
+defaults:
+  run:
+    working-directory: php
+
+jobs:
+  test:
+    name: php ${{ matrix.php }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        php: ['8.1', '8.2', '8.3', '8.4']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: json, zlib
+          coverage: none
+
+      - name: Install
+        run: composer install --no-interaction --no-progress
+
+      - name: Test
+        run: composer test
+
+      - name: Benchmark
+        run: composer benchmark
+
+      - name: Check the command line runs
+        run: |
+          php bin/json-compress --version
+          echo "[{\"a\":1},{\"a\":2}]" | php bin/json-compress compress
+
+  no-zlib:
+    name: works without the zlib extension
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: json
+          ini-values: disable_functions=gzencode,gzdecode
+          coverage: none
+
+      - name: Install
+        run: composer install --no-interaction --no-progress
+
+      # zlib is optional: the library must compress and decompress without it,
+      # and report a gzip size as unavailable rather than throwing.
+      - name: Test
+        run: composer test
+
+  no-composer:
+    name: works from a checkout with no composer
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: json, zlib
+          coverage: none
+
+      - name: Compress through the bundled autoloader
+        run: |
+          echo "[{\"a\":1},{\"a\":2}]" | php bin/json-compress compress
+          php examples/benchmark.php
+
+  interop:
+    name: agrees with the javascript implementation
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: json, zlib
+          coverage: none
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Every case in the corpus, compressed by one implementation and restored
+      # by the other, both ways round - and the envelopes compared byte for
+      # byte, which is stronger than the format requires.
+      - name: Round-trip the corpus through both implementations
+        run: node tests/interop/verify-interop.mjs

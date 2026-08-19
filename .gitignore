@@ -26,6 +26,13 @@ python/*.egg-info/
 .pytest_cache/
 .ruff_cache/
 
+# PHP dependencies and caches. composer.lock is not committed: this is a
+# library, and the lock file of a library binds nobody.
+php/vendor/
+php/composer.lock
+php/.phpunit.cache/
+.phpunit.result.cache
+
 # Editor and OS noise
 .DS_Store
 Thumbs.db

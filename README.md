@@ -31,7 +31,7 @@ JSON, so it travels anywhere JSON travels.
 | **JavaScript / TypeScript** | [`@tech-style/json-compress`](https://www.npmjs.com/package/@tech-style/json-compress) on npm | Released — [`javascript/`](javascript/) |
 | **.NET** | [`TechStyle.JsonCompress`](https://www.nuget.org/packages/TechStyle.JsonCompress) on NuGet | Released — [`dotnet/`](dotnet/) |
 | **Python** | [`json-compress`](https://pypi.org/project/json-compress/) on PyPI | Released — [`python/`](python/) |
-| PHP | Packagist | Planned |
+| **PHP** | [`tech-style/json-compress`](https://packagist.org/packages/tech-style/json-compress) on Packagist | Released — [`php/`](php/) |
 | Java | Maven Central | Planned |
 
 Every implementation targets the same wire format, defined in
@@ -175,6 +175,30 @@ library. The same command line comes with the package:
 json-compress stats orders.json
 ```
 
+### In PHP
+
+```bash
+composer require tech-style/json-compress
+```
+
+```php
+use TechStyle\JsonCompress\JsonCompress;
+
+$small  = JsonCompress::compress($records);
+$back   = JsonCompress::decompress($small);
+$report = JsonCompress::measure($records);
+```
+
+PHP 8.1 and later, no dependencies — `ext-json` is bundled with PHP and is all
+it needs. Objects come back as `stdClass` and arrays as lists, so an empty
+object stays distinct from an empty array; associative arrays go in unchanged,
+so records from PDO need no conversion. The same command line comes with the
+package:
+
+```bash
+vendor/bin/json-compress stats orders.json
+```
+
 ### Or online, with nothing at all
 
 **[tech-style.co/json-minifier.html](https://tech-style.co/json-minifier.html)**
@@ -191,6 +215,7 @@ SPEC.md         The wire format. The contract every implementation meets.
 javascript/     The JavaScript and TypeScript implementation, published to npm.
 dotnet/         The .NET implementation, published to NuGet.
 python/         The Python implementation, published to PyPI.
+php/            The PHP implementation, published to Packagist.
 LICENSE         MIT, for everything here.
 ```
 

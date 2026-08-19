@@ -1,0 +1,13 @@
+# Everything a release needs is src/, bin/ and the three documents beside them.
+# The rest is for working on the library rather than using it, and only makes
+# the Packagist download larger.
+/.gitattributes    export-ignore
+/phpunit.xml.dist  export-ignore
+/tests             export-ignore
+/examples          export-ignore
+
+# Line endings are normalised on the way in, so a document written on Windows
+# and one written on Linux compare equal - which the conformance tests rely on.
+* text=auto eol=lf
+*.mjs text eol=lf
+/bin/json-compress text eol=lf

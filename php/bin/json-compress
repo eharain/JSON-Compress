@@ -1,0 +1,45 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * The json-compress command line.
+ *
+ * Works installed by Composer, vendored, or from a checkout: the first
+ * autoloader that exists wins, and the bundled one needs nothing installed at
+ * all.
+ */
+
+declare(strict_types=1);
+
+namespace TechStyle\JsonCompress;
+
+use function array_slice;
+
+(static function (): void {
+    $candidates = [
+        // Installed as a dependency: vendor/tech-style/json-compress/bin/..
+        __DIR__ . '/../../../autoload.php',
+        // Installed on its own, with its own vendor directory.
+        __DIR__ . '/../vendor/autoload.php',
+        // A plain checkout, with no Composer anywhere in sight.
+        __DIR__ . '/../autoload.php',
+    ];
+
+    foreach ($candidates as $file) {
+        if (is_file($file)) {
+            require $file;
+
+            return;
+        }
+    }
+
+    fwrite(STDERR, "json-compress: cannot find an autoloader - run composer install\n");
+    exit(1);
+})();
+
+if (PHP_SAPI !== 'cli') {
+    fwrite(STDERR, "json-compress: this is a command line tool\n");
+    exit(1);
+}
+
+exit(Cli::main(array_slice($argv, 1)));
