@@ -1,10 +1,21 @@
 # JSON-Compress
 
 **Lossless JSON compression that is still JSON.**
+Six languages. One wire format. The same bytes out of every one of them.
 
-One wire format, implemented across languages, so a document compressed by a
-Node service reads correctly in a PHP worker, a Java batch job or a Python
-notebook.
+Compress a payload in a Node service and a Go worker restores it exactly. Or a
+PHP cron job, a .NET batch, a Rust service, a Python notebook — any of them, in
+any direction. The compressed form is a published specification rather than a
+private arrangement between a library and itself, which for a compression format
+is the unusual part.
+
+[![npm](https://img.shields.io/npm/v/@tech-style/json-compress?label=npm)](https://www.npmjs.com/package/@tech-style/json-compress)
+[![NuGet](https://img.shields.io/nuget/v/TechStyle.JsonCompress?label=NuGet)](https://www.nuget.org/packages/TechStyle.JsonCompress)
+[![PyPI](https://img.shields.io/pypi/v/json-compress?label=PyPI)](https://pypi.org/project/json-compress/)
+[![Packagist](https://img.shields.io/packagist/v/tech-style/json-compress?label=Packagist)](https://packagist.org/packages/tech-style/json-compress)
+[![Go reference](https://pkg.go.dev/badge/github.com/eharain/JSON-Compress/go.svg)](https://pkg.go.dev/github.com/eharain/JSON-Compress/go)
+[![crates.io](https://img.shields.io/crates/v/json-compress?label=crates.io)](https://crates.io/crates/json-compress)
+[![licence](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
 
 ```
 {"id":1,"name":"Ada","role":"admin","country":"United Kingdom"},
@@ -33,6 +44,7 @@ JSON, so it travels anywhere JSON travels.
 | **Python** | [`json-compress`](https://pypi.org/project/json-compress/) on PyPI | Released — [`python/`](python/) |
 | **PHP** | [`tech-style/json-compress`](https://packagist.org/packages/tech-style/json-compress) on Packagist | Released — [`php/`](php/) |
 | **Go** | [`github.com/eharain/JSON-Compress/go`](https://pkg.go.dev/github.com/eharain/JSON-Compress/go) | Released — [`go/`](go/) |
+| **Rust** | [`json-compress`](https://crates.io/crates/json-compress) on crates.io | Released — [`rust/`](rust/) |
 | Java | Maven Central | Planned |
 
 Every implementation targets the same wire format, defined in
@@ -41,11 +53,86 @@ without reading any of the existing code, and it carries the conformance rules a
 port has to meet.
 
 The released implementations do more than target the same format: they write the
-same bytes. A corpus of 144 documents — the awkward cases from the
-specification, plus 120 generated from a seeded source every suite reproduces —
-is compressed by each and restored by the others on every CI run. That is
-stronger than the specification requires, and it is the sharpest evidence
-available that they are making the same decisions for the same reasons.
+same bytes. A document compressed by any one of them is restored by any other —
+that is the point of the whole exercise, and it is checked on every CI run
+against a shared corpus. See [one format, six
+languages](#one-format-six-languages-the-same-bytes) below.
+
+---
+
+## One format, six languages, the same bytes
+
+Compression libraries are usually a single-language affair: whatever compressed
+the document has to be present to read it back, and the compressed form is a
+private matter between a library and itself. This one is a **format** first,
+written down in [`SPEC.md`](SPEC.md) and implemented six times against it.
+
+| restored by ↓ &nbsp; compressed by → | JS | .NET | Python | PHP | Go | Rust |
+|---|:--:|:--:|:--:|:--:|:--:|:--:|
+| **JavaScript / TypeScript** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **.NET** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Python** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **PHP** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Go** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Rust** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+All thirty-six cells, and it is stronger than it looks. The implementations do
+not merely *interoperate* — given the same document they emit **the same bytes**.
+Any one of them can be the encoder and any other the decoder, in any direction,
+and no cell is a special case with a compatibility shim behind it.
+
+Every implementation also ships the same command line, called `json-compress`,
+so the guarantee is something you can watch happen:
+
+```bash
+# a Python service writes the payload
+json-compress compress orders.json > orders.jc.json
+
+# a Go worker, a PHP cron job, a .NET batch or a Rust service reads it back —
+# same command, same bytes, whichever one you run
+json-compress decompress orders.jc.json > restored.json
+
+diff orders.json restored.json    # no output
+```
+
+### How that is kept true
+
+A corpus of **144 documents** — the awkward cases from the specification, plus
+120 generated from a seeded source every suite reproduces independently — is
+checked in once at
+[`dotnet/tests/.../conformance.json`](dotnet/tests/TechStyle.JsonCompress.Tests/fixtures/conformance.json),
+paired with the envelope the reference encoder wrote for each.
+
+Every implementation asserts **both directions** against that one shared file on
+every CI run: it must restore all 144 envelopes to the original value, and it
+must write those same 144 envelopes itself. The specification only asks for the
+first. Ports here do the second as well, which is what turns "compatible" into
+"identical".
+
+The corpus is the awkward cases on purpose: the tilde escape, holes standing
+against real nulls, `__proto__` as a key name, key names that look like tokens,
+catalogues large enough to need two-character tokens, rows whose key orders
+disagree, and a raw column whose last cell is `-1`. Every one of those has
+broken an implementation at some point, and each is now a case with a name.
+
+### Where the languages are allowed to differ
+
+Honest small print, because it is better read here than discovered later. The
+six agree on every document JavaScript could have written. They diverge only
+where the languages' own number models diverge, on JSON text `JSON.stringify`
+could not have produced in the first place:
+
+- **.NET preserves a number's raw literal**, so `1E2`, `10.0` and
+  `12345678901234567890` survive verbatim; JavaScript, Python and PHP each
+  canonicalise through their own parser.
+- **`1` and `1.0` for one key across rows** make JavaScript alone treat the
+  column as constant, because JavaScript alone cannot tell the two apart.
+- **Go's gzip figures** in a size report differ by about a percentage point,
+  because `compress/flate` is not zlib. The compressed size itself matches to
+  the byte.
+
+Each implementation still restores its own documents exactly, which is all the
+format promises. These are differences between languages, not defects in ports.
 
 ---
 
@@ -225,6 +312,32 @@ go install github.com/eharain/JSON-Compress/go/cmd/json-compress@latest
 json-compress stats orders.json
 ```
 
+### In Rust
+
+```bash
+cargo add json-compress --features serde
+```
+
+```rust
+use json_compress::{to_value, from_value, to_string, from_str};
+
+let small = to_string(&to_value(&records)?)?;
+let back: Vec<Record> = from_value(from_str(&small)?)?;
+let report = json_compress::measure(&to_value(&records)?)?;
+```
+
+Rust 1.70 and later, and with both features off, no dependencies at all —
+`serde` is opt-in and `gzip` is opt-in because the standard library has no
+deflate. Objects come back as an ordered `Object` rather than a `HashMap`,
+because a hash map cannot give key order back; with the `serde` feature, anything
+that implements `Serialize` goes in and struct fields keep their declared order.
+The same command line comes with the crate:
+
+```bash
+cargo install json-compress --features gzip
+json-compress stats orders.json
+```
+
 ### Or online, with nothing at all
 
 **[tech-style.co/json-minifier.html](https://tech-style.co/json-minifier.html)**
@@ -243,6 +356,7 @@ dotnet/         The .NET implementation, published to NuGet.
 python/         The Python implementation, published to PyPI.
 php/            The PHP implementation, published to Packagist.
 go/             The Go implementation, a module in its own right.
+rust/           The Rust implementation, published to crates.io.
 LICENSE         MIT, for everything here.
 ```
 

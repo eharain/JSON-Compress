@@ -7,6 +7,11 @@ trip.
 [![Packagist](https://img.shields.io/packagist/v/tech-style/json-compress.svg)](https://packagist.org/packages/tech-style/json-compress)
 [![PHP version](https://img.shields.io/packagist/php-v/tech-style/json-compress.svg)](https://packagist.org/packages/tech-style/json-compress)
 [![licence](https://img.shields.io/badge/licence-MIT-blue.svg)](https://github.com/eharain/JSON-Compress/blob/main/LICENSE)
+[![six implementations](https://img.shields.io/badge/implementations-6_languages-a3e635.svg)](https://github.com/eharain/JSON-Compress#one-format-six-languages-the-same-bytes)
+
+**One of six implementations of one wire format** — JavaScript, .NET, Python,
+PHP, Go and Rust. Compress in any of them, restore in any other, byte for byte.
+[How that is guaranteed ↓](#the-same-format-in-six-languages)
 
 ```bash
 composer require tech-style/json-compress
@@ -87,9 +92,9 @@ left. On record-shaped data, a further 5–20% on top of gzip. On a small config
 file with little repetition, the envelope costs more than it saves, and the
 table says so.
 
-The first four columns match the JavaScript, .NET and Python benchmarks figure
-for figure, because all four build the same documents from the same generator
-and all four encoders write the same bytes.
+The first four columns match the other five implementations' benchmarks figure
+for figure, because all six build the same documents from the same generator and
+all six encoders write the same bytes.
 
 **Use it for record sets, logs, time series and API responses.** For a small
 document you already gzip, it will not earn its keep — measure with `measure()`
@@ -419,6 +424,61 @@ outline:
 
 Keys become short letter-first tokens; a tilde marks a catalogue reference or an
 escaped literal; a `~t` member marks a columnar table. That is the whole of it.
+
+---
+
+## The same format, in six languages
+
+This is one of six implementations of the same wire format. They do not merely
+interoperate: given the same document they emit **the same bytes**. A payload
+compressed by any one of them is restored exactly by any other, in any
+direction.
+
+| Language | Package | Install | |
+|---|---|---|---|
+| JavaScript / TypeScript | [`@tech-style/json-compress`](https://www.npmjs.com/package/@tech-style/json-compress) on npm | `npm install @tech-style/json-compress` | |
+| .NET | [`TechStyle.JsonCompress`](https://www.nuget.org/packages/TechStyle.JsonCompress) on NuGet | `dotnet add package TechStyle.JsonCompress` | |
+| Python | [`json-compress`](https://pypi.org/project/json-compress/) on PyPI | `pip install json-compress` | |
+| **PHP** | [`tech-style/json-compress`](https://packagist.org/packages/tech-style/json-compress) on Packagist | `composer require tech-style/json-compress` | **this one** |
+| Go | [`github.com/eharain/JSON-Compress/go`](https://pkg.go.dev/github.com/eharain/JSON-Compress/go) | `go get github.com/eharain/JSON-Compress/go` | |
+| Rust | [`json-compress`](https://crates.io/crates/json-compress) on crates.io | `cargo add json-compress` | |
+
+Java is planned, against the same specification.
+
+Every one of them ships the same command line, called `json-compress`, so the
+guarantee is something you can watch happen:
+
+```bash
+json-compress compress  orders.json    > orders.jc.json   # in any language
+json-compress decompress orders.jc.json > restored.json    # in any other
+diff orders.json restored.json                             # no output
+```
+
+### How that is kept true
+
+A corpus of **144 documents** — the awkward cases from the specification, plus
+120 generated from a seeded source every suite reproduces independently — is
+checked in once at
+[`dotnet/tests/.../conformance.json`](https://github.com/eharain/JSON-Compress/blob/main/dotnet/tests/TechStyle.JsonCompress.Tests/fixtures/conformance.json),
+each paired with the envelope the reference encoder wrote for it.
+
+Every implementation asserts **both directions** against that one shared file on
+every CI run: it must restore all 144 envelopes to the original value, and it
+must write those same 144 envelopes itself. The specification only requires the
+first. Doing the second as well is what turns "compatible" into "identical".
+
+The cases are the awkward ones on purpose — the tilde escape, holes standing
+against real nulls, `__proto__` as a key name, key names shaped like tokens,
+catalogues large enough to need two-character tokens, rows whose key orders
+disagree, a raw column whose last cell is `-1`. Each of those has broken an
+implementation at some point.
+
+The six agree on every document JavaScript could have written, and diverge only
+where the languages' own number models do — on JSON text `JSON.stringify` could
+not have produced in the first place. The [root
+README](https://github.com/eharain/JSON-Compress#where-the-languages-are-allowed-to-differ) lists those cases
+precisely. Each implementation still restores its own documents exactly, which
+is all the format promises.
 
 ---
 
