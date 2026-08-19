@@ -1,0 +1,102 @@
+name: rust
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'rust/**'
+      - '.github/workflows/rust.yml'
+  pull_request:
+    paths:
+      - 'rust/**'
+      - '.github/workflows/rust.yml'
+
+defaults:
+  run:
+    working-directory: rust
+
+jobs:
+  test:
+    name: rust ${{ matrix.rust }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        rust: ['1.70', stable]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+
+      # 1.70 is the declared minimum: the library and the command line have to
+      # build on it. The test suite needs whatever the dev-dependencies need, so
+      # it runs on stable only.
+      - name: Build
+        run: cargo build --all-features
+
+      - name: Test
+        if: matrix.rust == 'stable'
+        run: cargo test --all-features
+
+      - name: Test with no features at all
+        if: matrix.rust == 'stable'
+        run: cargo test --no-default-features
+
+      - name: Benchmark
+        if: matrix.rust == 'stable'
+        run: cargo run --release --example benchmark --features gzip
+
+      - name: Check the command line runs
+        if: matrix.rust == 'stable'
+        run: |
+          cargo run --quiet --bin json-compress -- --version
+          echo '[{"a":1},{"a":2}]' | cargo run --quiet --bin json-compress -- compress
+
+  lint:
+    name: clippy and rustfmt
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+
+      - name: Check formatting
+        run: cargo fmt --check
+
+      - name: Clippy
+        run: cargo clippy --all-targets --all-features -- -D warnings
+
+      # The docs are part of the package, so a broken link is a broken release.
+      - name: Check the documentation builds
+        run: cargo doc --all-features --no-deps
+        env:
+          RUSTDOCFLAGS: -D warnings
+
+      - name: Check the package contents
+        run: cargo package --allow-dirty --no-verify
+
+  interop:
+    name: agrees with the javascript implementation
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Every case in the corpus, compressed by one implementation and restored
+      # by the other, both ways round - and the envelopes compared byte for
+      # byte, which is stronger than the format requires.
+      - name: Round-trip the corpus through both implementations
+        run: node tests/interop/verify-interop.mjs

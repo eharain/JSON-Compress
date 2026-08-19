@@ -1,0 +1,47 @@
+[package]
+name = "json-compress"
+version = "1.0.0"
+edition = "2021"
+rust-version = "1.70"
+description = "Lossless JSON compression that is still JSON: a key catalogue, columnar tables and a string catalogue, typically 45-75% smaller."
+license = "MIT"
+repository = "https://github.com/eharain/JSON-Compress"
+homepage = "https://github.com/eharain/JSON-Compress/tree/main/rust"
+documentation = "https://docs.rs/json-compress"
+readme = "README.md"
+keywords = ["json", "compression", "columnar", "size", "serde"]
+categories = ["compression", "encoding", "data-structures"]
+exclude = ["tests/interop/**"]
+
+[lib]
+name = "json_compress"
+path = "src/lib.rs"
+
+[[bin]]
+name = "json-compress"
+path = "src/bin/json-compress.rs"
+
+[features]
+default = []
+# Serialize and Deserialize for the value model, plus to_value / from_value, so
+# any serde type can be compressed and restored.
+serde = ["dep:serde"]
+# Gzip figures in Measure, and the gzip helpers. The standard library has no
+# deflate, so this is the one thing the crate cannot do on its own.
+gzip = ["dep:flate2"]
+
+[dependencies]
+serde = { version = "1.0", optional = true, default-features = false, features = ["std"] }
+flate2 = { version = "1.0", optional = true }
+
+[dev-dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[[example]]
+name = "benchmark"
+required-features = ["gzip"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

@@ -50,3 +50,11 @@ Thumbs.db
 # Logs
 npm-debug.log*
 *.log
+
+# Rust build output. Cargo.lock is not committed: this is a library, and the
+# lock file of a library binds nobody - the CI matrix wants to resolve fresh.
+rust/target/
+rust/Cargo.lock
+rust/fuzz/target/
+rust/fuzz/corpus/
+rust/fuzz/artifacts/
