@@ -32,6 +32,7 @@ JSON, so it travels anywhere JSON travels.
 | **.NET** | [`TechStyle.JsonCompress`](https://www.nuget.org/packages/TechStyle.JsonCompress) on NuGet | Released — [`dotnet/`](dotnet/) |
 | **Python** | [`json-compress`](https://pypi.org/project/json-compress/) on PyPI | Released — [`python/`](python/) |
 | **PHP** | [`tech-style/json-compress`](https://packagist.org/packages/tech-style/json-compress) on Packagist | Released — [`php/`](php/) |
+| **Go** | [`github.com/eharain/JSON-Compress/go`](https://pkg.go.dev/github.com/eharain/JSON-Compress/go) | Released — [`go/`](go/) |
 | Java | Maven Central | Planned |
 
 Every implementation targets the same wire format, defined in
@@ -199,6 +200,31 @@ package:
 vendor/bin/json-compress stats orders.json
 ```
 
+### In Go
+
+```bash
+go get github.com/eharain/JSON-Compress/go
+```
+
+```go
+import jsoncompress "github.com/eharain/JSON-Compress/go"
+
+small, err := jsoncompress.Marshal(records)
+back, err := jsoncompress.Unmarshal(small)
+report, err := jsoncompress.Measure(records)
+```
+
+Go 1.21 and later, no dependencies — the standard library is all it needs.
+Objects come back as an ordered `*Object` rather than a `map[string]any`,
+because a Go map cannot give key order back; anything `encoding/json` can
+marshal goes in unchanged, struct tags and all. The same command line comes with
+the module:
+
+```bash
+go install github.com/eharain/JSON-Compress/go/cmd/json-compress@latest
+json-compress stats orders.json
+```
+
 ### Or online, with nothing at all
 
 **[tech-style.co/json-minifier.html](https://tech-style.co/json-minifier.html)**
@@ -216,6 +242,7 @@ javascript/     The JavaScript and TypeScript implementation, published to npm.
 dotnet/         The .NET implementation, published to NuGet.
 python/         The Python implementation, published to PyPI.
 php/            The PHP implementation, published to Packagist.
+go/             The Go implementation, a module in its own right.
 LICENSE         MIT, for everything here.
 ```
 

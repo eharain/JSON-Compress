@@ -1,0 +1,115 @@
+name: go
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'go/**'
+      - '.github/workflows/go.yml'
+  pull_request:
+    paths:
+      - 'go/**'
+      - '.github/workflows/go.yml'
+
+defaults:
+  run:
+    working-directory: go
+
+jobs:
+  test:
+    name: go ${{ matrix.go }} on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        go: ['1.21', '1.22', '1.23', 'stable']
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go }}
+          cache-dependency-path: go/go.mod
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test ./...
+
+      - name: Test with the race detector
+        if: runner.os == 'Linux'
+        run: go test -race ./...
+
+      - name: Benchmark
+        run: go run ./examples/benchmark
+
+      - name: Check the command line runs
+        run: |
+          go run ./cmd/json-compress --version
+          echo "[{\"a\":1},{\"a\":2}]" | go run ./cmd/json-compress compress
+
+  format:
+    name: gofmt
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      # gofmt writes nothing when everything is already formatted, so anything
+      # it names is a file that needs it.
+      - name: Check formatting
+        run: |
+          unformatted=$(gofmt -l .)
+          if [ -n "$unformatted" ]; then
+            echo "$unformatted"
+            exit 1
+          fi
+
+  fuzz:
+    name: fuzzing
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      # Short bursts on every run, which find the problems a seeded generator
+      # does not think to try.
+      - name: Fuzz the round trip
+        run: go test -run FuzzRoundTrip -fuzz FuzzRoundTrip -fuzztime 60s
+
+      # The reader is hand-written, so this holds it to the standard library's
+      # answers: the same documents accepted, the same refused, the same values.
+      - name: Fuzz the reader against encoding/json
+        run: go test -run FuzzParseAgreesWithEncodingJson -fuzz FuzzParseAgreesWithEncodingJson -fuzztime 60s
+
+  interop:
+    name: agrees with the javascript implementation
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Every case in the corpus, compressed by one implementation and restored
+      # by the other, both ways round - and the envelopes compared byte for
+      # byte, which is stronger than the format requires.
+      - name: Round-trip the corpus through both implementations
+        run: node tests/interop/verify-interop.mjs

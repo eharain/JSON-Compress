@@ -33,6 +33,14 @@ php/composer.lock
 php/.phpunit.cache/
 .phpunit.result.cache
 
+# Go build output, and the corpus `go test -fuzz` writes as it works. The module
+# has no dependencies, so there is no go.sum and nothing vendored.
+go/json-compress
+go/json-compress.exe
+go/**/testdata/fuzz/
+go/**/*.test
+go/coverage.out
+
 # Editor and OS noise
 .DS_Store
 Thumbs.db

@@ -1,0 +1,5 @@
+# Line endings are normalised on the way in and back out again, so gofmt sees
+# the files it formatted whatever platform they were checked out on, and a
+# document written on Windows compares equal to the same one written on Linux -
+# which the conformance tests rely on.
+* text=auto eol=lf
