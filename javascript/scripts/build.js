@@ -16,7 +16,7 @@ const dist = join(root, 'dist');
 const entry = join(root, 'src', 'index.js');
 
 const banner = {
-  js: '/*! @tech-style/json-compress v1.0.2 | MIT | https://github.com/eharain/JSON-Compress */',
+  js: '/*! @tech-style/json-compress v1.0.3 | MIT | https://github.com/eharain/JSON-Compress */',
 };
 
 rmSync(dist, { recursive: true, force: true });

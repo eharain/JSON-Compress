@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "json-compress"
-version = "1.0.0"
+version = "1.0.3"
 description = "Lossless, dependency-free JSON compression for Python. Hoists repeated object keys into a catalogue, packs lists of dicts into columnar tables, and de-duplicates repeated string values - typically 40-80% smaller JSON, still valid JSON, and an exact round trip."
 readme = "README.md"
 license = { file = "LICENSE" }

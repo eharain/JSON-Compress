@@ -4,6 +4,13 @@ All notable changes to `TechStyle.JsonCompress` are recorded here. The format
 follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project
 uses [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2026-10-13
+
+### Changed
+
+- Version aligned with the other implementations, which all release as 1.0.3. No change in
+  behaviour: the -1 column fix in JavaScript 1.0.3 never affected .NET.
+
 ## [1.0.0] - 2026-08-18
 
 First release. Implements version 1 of the json-compress wire format, the same

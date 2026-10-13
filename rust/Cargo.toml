@@ -1,6 +1,6 @@
 [package]
 name = "json-compress"
-version = "1.0.0"
+version = "1.0.3"
 edition = "2021"
 rust-version = "1.70"
 description = "Lossless JSON compression that is still JSON: a key catalogue, columnar tables and a string catalogue, typically 45-75% smaller."

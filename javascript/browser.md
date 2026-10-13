@@ -8,7 +8,7 @@ paste a script tag into a page and `compress` is there.
 ## A script tag
 
 ```html
-<script src="https://cdn.jsdelivr.net/gh/eharain/JSON-Compress@1.0.2/javascript/dist/json-compress.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/eharain/JSON-Compress@1.0.3/javascript/dist/json-compress.min.js"></script>
 <script>
   const small = jsonCompress.compress(myData);
   const back  = jsonCompress.decompress(small);
@@ -28,7 +28,7 @@ No global, no build tool, no bundler:
 ```html
 <script type="module">
   import { compress, decompress, measure } from
-    'https://cdn.jsdelivr.net/gh/eharain/JSON-Compress@1.0.2/javascript/dist/index.mjs';
+    'https://cdn.jsdelivr.net/gh/eharain/JSON-Compress@1.0.3/javascript/dist/index.mjs';
 
   const small = compress(myData);
   console.log(await measure(myData));
@@ -42,7 +42,7 @@ browser console.
 
 | URL | Resolves to |
 |---|---|
-| `…/JSON-Compress@1.0.2/…` | That release, forever. **Use this in production.** |
+| `…/JSON-Compress@1.0.3/…` | That release, forever. **Use this in production.** |
 | `…/JSON-Compress@main/…` | The tip of `main`, cached by the CDN for up to 12 hours. |
 | `…/JSON-Compress@1a2b3c4/…` | One exact commit. |
 
@@ -56,7 +56,7 @@ in entirely the wrong place.
 
 If a freshly pushed tag 404s for a minute or two, the CDN has not fetched that
 file yet. Requesting
-`https://purge.jsdelivr.net/gh/eharain/JSON-Compress@1.0.2/javascript/dist/json-compress.min.js`
+`https://purge.jsdelivr.net/gh/eharain/JSON-Compress@1.0.3/javascript/dist/json-compress.min.js`
 prompts it, and the next request succeeds.
 
 ## Straight from npm instead
@@ -77,7 +77,7 @@ you the hash: append `?meta` to any file URL, or use
 
 ```html
 <script
-  src="https://cdn.jsdelivr.net/gh/eharain/JSON-Compress@1.0.2/javascript/dist/json-compress.min.js"
+  src="https://cdn.jsdelivr.net/gh/eharain/JSON-Compress@1.0.3/javascript/dist/json-compress.min.js"
   integrity="sha384-…"
   crossorigin="anonymous"></script>
 ```
@@ -106,7 +106,7 @@ Copy this into a file and open it. No server needed.
 <button id="go">Compress</button>
 <pre id="out"></pre>
 
-<script src="https://cdn.jsdelivr.net/gh/eharain/JSON-Compress@1.0.2/javascript/dist/json-compress.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/eharain/JSON-Compress@1.0.3/javascript/dist/json-compress.min.js"></script>
 <script>
   document.getElementById('go').onclick = async () => {
     const source = JSON.parse(document.getElementById('in').value);

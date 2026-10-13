@@ -54,7 +54,7 @@ final class JsonCompress
     public const FORMAT_VERSION = Wire::FORMAT_VERSION;
 
     /** The version of this package. */
-    public const VERSION = '1.0.0';
+    public const VERSION = '1.0.3';
 
     private function __construct()
     {

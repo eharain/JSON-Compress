@@ -1,0 +1,67 @@
+{
+    "name": "tech-style/json-compress",
+    "description": "Lossless, dependency-free JSON compression for PHP. Hoists repeated object keys into a catalogue, packs lists of like-shaped objects into columnar tables, and de-duplicates repeated string values - typically 40-80% smaller JSON, still valid JSON, and an exact round trip.",
+    "type": "library",
+    "keywords": [
+        "json",
+        "compress",
+        "compression",
+        "decompress",
+        "minify",
+        "columnar",
+        "deduplicate",
+        "payload",
+        "bandwidth",
+        "api",
+        "serialization",
+        "lossless",
+        "gzip"
+    ],
+    "homepage": "https://tech-style.co/product-json-compress.html",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Ejaz Hussain Arain",
+            "email": "hello@tech-style.co"
+        },
+        {
+            "name": "Tech Style Ltd",
+            "homepage": "https://tech-style.co"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/eharain/JSON-Compress/issues",
+        "source": "https://github.com/eharain/JSON-Compress/tree/main/php",
+        "docs": "https://github.com/eharain/JSON-Compress/blob/main/SPEC.md"
+    },
+    "require": {
+        "php": "^8.1",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5 || ^11.0"
+    },
+    "suggest": {
+        "ext-zlib": "Needed by the gzip helpers and by the gzip figures in a size report"
+    },
+    "autoload": {
+        "psr-4": {
+            "TechStyle\\JsonCompress\\": "php/src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TechStyle\\JsonCompress\\Tests\\": "php/tests/"
+        }
+    },
+    "bin": [
+        "php/bin/json-compress"
+    ],
+    "scripts": {
+        "test": "phpunit -c php",
+        "benchmark": "php php/examples/benchmark.php"
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

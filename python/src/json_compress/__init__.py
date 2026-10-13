@@ -40,7 +40,7 @@ from .options import DEFAULT_OPTIONS, CompressOptions, resolve_options
 from .pack import is_packed, pack, pack_all, text_to_array, unpack, unpack_all
 from .sizes import byte_length, gunzip, gzip_bytes, gzip_size
 
-__version__ = "1.0.0"
+__version__ = "1.0.3"
 
 __all__ = [
     "FORMAT_VERSION",
