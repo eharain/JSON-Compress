@@ -4,6 +4,12 @@ Compress, restore, measure, minify, beautify and validate JSON documents from
 the shell. The compressed form is still ordinary JSON, and the round trip is
 exact.
 
+## Video
+
+[![JSON Compress: lossless JSON compression that is still JSON](https://raw.githubusercontent.com/eharain/JSON-Compress/main/docs/media/video-thumbnail.jpg)](https://www.youtube.com/watch?v=FlY6yl79UDo)
+
+A 1:11 introduction on YouTube, with English captions.
+
 ```bash
 dotnet tool install --global TechStyle.JsonCompress.Cli
 ```

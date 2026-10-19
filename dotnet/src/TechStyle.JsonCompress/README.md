@@ -4,6 +4,12 @@
 later, no binary framing, no code generation. Typically 45–75% smaller, and an
 exact round trip.
 
+## Video
+
+[![JSON Compress: lossless JSON compression that is still JSON](https://raw.githubusercontent.com/eharain/JSON-Compress/main/docs/media/video-thumbnail.jpg)](https://www.youtube.com/watch?v=FlY6yl79UDo)
+
+A 1:11 introduction on YouTube, with English captions.
+
 ```csharp
 using System.Text.Json.Nodes;
 using TechStyle.JsonCompress;
