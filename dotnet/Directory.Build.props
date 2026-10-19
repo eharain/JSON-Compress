@@ -9,7 +9,7 @@
   -->
 
   <PropertyGroup>
-    <VersionPrefix>1.0.3</VersionPrefix>
+    <VersionPrefix>1.0.4</VersionPrefix>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>

@@ -4,6 +4,15 @@ All notable changes to `@tech-style/json-compress` are recorded here. The format
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses
 [semantic versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4] - 2026-10-20
+
+### Changed
+
+- The README shows the introduction video. No change in behaviour or in the
+  wire format.
+- The build uses esbuild 0.28. The built files are the same apart from the
+  version in their banner.
+
 ## [1.0.3] - 2026-10-13
 
 ### Fixed

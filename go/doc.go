@@ -41,4 +41,4 @@ package jsoncompress
 
 // Version is the version of this implementation, which is not the same thing as
 // the version of the wire format ([FormatVersion]).
-const Version = "1.0.3"
+const Version = "1.0.4"
