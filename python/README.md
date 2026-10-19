@@ -47,6 +47,12 @@ implementations, and the other way round — which is not a claim, but a
 [test](tests/test_conformance.py) run against a corpus the JavaScript encoder
 produced.
 
+## Video
+
+[![JSON Compress: lossless JSON compression that is still JSON](https://raw.githubusercontent.com/eharain/JSON-Compress/main/docs/media/video-thumbnail.jpg)](https://www.youtube.com/watch?v=FlY6yl79UDo)
+
+A 1:11 introduction on YouTube, with English captions.
+
 ---
 
 ## Why

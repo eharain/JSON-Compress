@@ -33,6 +33,16 @@ column can take, a thousand copies of the one value a `currency` column ever
 holds. This writes each of them down once — and the result is still ordinary
 JSON, so it travels anywhere JSON travels.
 
+## Videos
+
+[![JSON Compress: lossless JSON compression that is still JSON](https://raw.githubusercontent.com/eharain/JSON-Compress/main/docs/media/video-thumbnail.jpg)](https://www.youtube.com/watch?v=FlY6yl79UDo)
+
+A 1:11 introduction on YouTube, with English captions.
+
+[![How to use the free JSON tool: minify, compress, round trip, validate](https://raw.githubusercontent.com/eharain/JSON-Compress/main/docs/media/video-walkthrough-thumbnail.jpg)](https://www.youtube.com/watch?v=wAH1eAwkHWs)
+
+A 1:06 walkthrough of the free browser tool on YouTube, with English captions.
+
 ---
 
 ## Implementations
